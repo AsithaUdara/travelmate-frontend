@@ -1,58 +1,68 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Plane } from 'lucide-react';
+import { Plane, ArrowRight } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 const Header = () => {
-  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const isLandingPage = pathname === '/';
+  const [scrolled, setScrolled] = React.useState(!isLandingPage);
 
-  useEffect(() => {
+  React.useEffect(() => {
+    if (!isLandingPage) {
+      setScrolled(true);
+      return;
+    }
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
-
     window.addEventListener('scroll', handleScroll);
-    // Cleanup function to remove the event listener
+    handleScroll();
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [isLandingPage]);
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ease-in-out ${
-        scrolled ? 'bg-white/80 backdrop-blur-sm shadow-md' : 'bg-transparent'
+      className={`fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl z-50 transition-all duration-300 ease-in-out ${
+        scrolled ? 'bg-white/90 backdrop-blur-sm shadow-md rounded-full' : 'bg-transparent'
       }`}
     >
-      <div className="container mx-auto flex items-center justify-between p-4">
-        {/* Logo */}
-        <Link href="/" className={`flex items-center gap-2 font-bold text-xl ${scrolled ? 'text-slate-800' : 'text-white'}`}>
+      <div className="container mx-auto flex items-center justify-between p-3">
+        <Link href="/" className={`flex items-center gap-2 font-bold text-xl transition-colors ${scrolled ? 'text-slate-900' : 'text-white'}`}>
           <Plane className="h-6 w-6" />
-          <span>TravelMate.lk</span>
+          <span>TravelMate</span>
         </Link>
 
-        {/* Navigation Links */}
-        <nav className="hidden md:flex items-center gap-6">
-          <Link href="#features" className={`text-sm font-medium transition-colors ${scrolled ? 'text-slate-600 hover:text-teal-600' : 'text-slate-200 hover:text-white'}`}>
+        <nav className="hidden md:flex items-center gap-8">
+          <Link href="/#features" className={`text-sm font-medium transition-colors ${scrolled ? 'text-slate-600 hover:text-slate-900' : 'text-slate-200 hover:text-white'}`}>
             Features
           </Link>
-          <Link href="#gallery" className={`text-sm font-medium transition-colors ${scrolled ? 'text-slate-600 hover:text-teal-600' : 'text-slate-200 hover:text-white'}`}>
+          <Link href="/#gallery" className={`text-sm font-medium transition-colors ${scrolled ? 'text-slate-600 hover:text-slate-900' : 'text-slate-200 hover:text-white'}`}>
             Gallery
           </Link>
-          <Link href="#faq" className={`text-sm font-medium transition-colors ${scrolled ? 'text-slate-600 hover:text-teal-600' : 'text-slate-200 hover:text-white'}`}>
+          <Link href="/#faq" className={`text-sm font-medium transition-colors ${scrolled ? 'text-slate-600 hover:text-slate-900' : 'text-slate-200 hover:text-white'}`}>
             FAQ
           </Link>
         </nav>
 
-        {/* Action Buttons */}
         <div className="flex items-center gap-2">
           <Link href="/login">
-            <Button variant={scrolled ? 'outline' : 'ghost'}>Log In</Button>
+            <Button variant="ghost" className={`${scrolled ? 'text-slate-600 hover:text-slate-900' : 'text-white hover:bg-white/10'}`}>
+              Log In
+            </Button>
           </Link>
           <Link href="/register">
-            <Button>Sign Up</Button>
+            {/* FIX: The flex container is now a span INSIDE the button */}
+            <Button>
+              <span className="flex items-center gap-2">
+                Sign Up <ArrowRight className="h-4 w-4" />
+              </span>
+            </Button>
           </Link>
         </div>
       </div>
