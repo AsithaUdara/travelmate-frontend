@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Place } from '../../lib/mock-data';
+import { Place } from '@/lib/mock-data';
 import { Icon } from 'leaflet';
 import { MapPin, Star } from 'lucide-react';
 import ReactDOMServer from 'react-dom/server';

@@ -10,6 +10,8 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import React from 'react';
@@ -48,8 +50,8 @@ const HeroSection = () => {
     return (
         // FIX: Using a negative top margin to pull the hero section back up under the transparent header
         <section className="relative -mt-24 h-screen min-h-[700px] w-full">
-            <Carousel
-                className="w-full h-full"
+      <Carousel
+        className="group w-full h-full"
                 plugins={[plugin.current]}
                 onMouseEnter={plugin.current.stop}
                 onMouseLeave={plugin.current.reset}
@@ -70,6 +72,9 @@ const HeroSection = () => {
                         </CarouselItem>
                     ))}
                 </CarouselContent>
+                {/* Edge arrows to navigate slides */}
+                <CarouselPrevious className="left-4 z-30 size-10 bg-white/70 hover:bg-white text-slate-800 shadow-md opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200" />
+                <CarouselNext className="right-4 z-30 size-10 bg-white/70 hover:bg-white text-slate-800 shadow-md opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200" />
             </Carousel>
             
             <div className="absolute inset-0 z-20 container mx-auto flex h-full items-center px-4">
@@ -146,7 +151,7 @@ const FeatureSection = () => (
 );
 
 const InspirationGallery = () => (
-    <section id="gallery" className="py-20 bg-white">
+  <section id="gallery" className="py-20 bg-white">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Embark on Your Sri Lankan Venture</h2>
         <p className="mt-4 text-lg text-slate-600">Yesterday you said tomorrow. Plan your dream trip today.</p>

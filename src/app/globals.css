@@ -57,6 +57,12 @@ body {
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
+html {
+  scroll-behavior: smooth;
+  /* Reserve space for the fixed header when using native anchor scrolling */
+  scroll-padding-top: 4.5rem; /* slightly smaller to reduce the gap under header */
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -133,4 +139,28 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+
+/* For custom Leaflet divIcons */
+.custom-leaflet-icon {
+  background: transparent;
+  border: none;
+}
+
+/* For custom Leaflet Popups */
+.custom-leaflet-popup .leaflet-popup-content-wrapper {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.custom-leaflet-popup .leaflet-popup-content {
+  margin: 0;
+  padding: 0;
+}
+
+.custom-leaflet-popup .leaflet-popup-tip {
+  display: none; /* Hide the default arrow */
 }
