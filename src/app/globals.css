@@ -140,3 +140,27 @@ html {
     @apply bg-background text-foreground;
   }
 }
+
+
+/* For custom Leaflet divIcons */
+.custom-leaflet-icon {
+  background: transparent;
+  border: none;
+}
+
+/* For custom Leaflet Popups */
+.custom-leaflet-popup .leaflet-popup-content-wrapper {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.custom-leaflet-popup .leaflet-popup-content {
+  margin: 0;
+  padding: 0;
+}
+
+.custom-leaflet-popup .leaflet-popup-tip {
+  display: none; /* Hide the default arrow */
+}

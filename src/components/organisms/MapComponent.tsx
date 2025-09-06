@@ -5,34 +5,41 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Place } from '@/lib/mock-data';
 import { Icon } from 'leaflet';
-import { MapPin } from 'lucide-react';
+import { MapPin, Star } from 'lucide-react';
 import ReactDOMServer from 'react-dom/server';
+import Image from 'next/image';
 
 type MapComponentProps = {
   places: Place[];
 };
 
-// Create a custom icon using a React component (Lucide icon)
+// Create a custom default icon
 const customIcon = new Icon({
-  iconUrl: `data:image/svg+xml;base64,${btoa(ReactDOMServer.renderToStaticMarkup(<MapPin className="h-10 w-10 text-red-500 fill-current" />))}`,
+  iconUrl: `data:image/svg+xml;base64,${btoa(ReactDOMServer.renderToStaticMarkup(<MapPin className="h-10 w-10 text-slate-800 fill-slate-800" />))}`,
   iconSize: [40, 40],
-  iconAnchor: [20, 40], // Point of the icon which will correspond to marker's location
-  popupAnchor: [0, -40] // Point from which the popup should open relative to the iconAnchor
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40]
+});
+
+// Create a custom icon for the hovered state
+const hoveredIcon = new Icon({
+  iconUrl: `data:image/svg+xml;base64,${btoa(ReactDOMServer.renderToStaticMarkup(<MapPin className="h-12 w-12 text-red-500 fill-red-500" />))}`,
+  iconSize: [48, 48],
+  iconAnchor: [24, 48],
+  popupAnchor: [0, -48]
 });
 
 
 export const MapComponent = ({ places }: MapComponentProps) => {
-  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+  const [hoveredPlace, setHoveredPlace] = useState<Place | null>(null);
 
   return (
-    // MapContainer replaces the old Map component
     <MapContainer 
-      center={[7.8731, 80.7718]} // Center of Sri Lanka
+      center={[7.8731, 80.7718]} 
       zoom={7} 
       style={{ width: '100%', height: '100%' }}
       scrollWheelZoom={true}
     >
-      {/* TileLayer is the map background itself, pointing to OpenStreetMap */}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -41,21 +48,31 @@ export const MapComponent = ({ places }: MapComponentProps) => {
       {places.map(place => (
         <Marker
           key={place.name}
-          position={[place.latitude, place.longitude]} // Leaflet uses [lat, lng] array
-          icon={customIcon}
+          position={[place.latitude, place.longitude]}
+          icon={hoveredPlace?.name === place.name ? hoveredIcon : customIcon} // Change icon on hover
           eventHandlers={{
-            click: () => {
-              setSelectedPlace(place);
+            mouseover: () => {
+              setHoveredPlace(place);
+            },
+            mouseout: () => {
+              setHoveredPlace(null);
             },
           }}
         >
-          {selectedPlace && selectedPlace.name === place.name && (
-             <Popup
-                onClose={() => setSelectedPlace(null)}
-              >
-              <div>
-                <h3 className="font-bold">{selectedPlace.name}</h3>
-                <p className="text-sm capitalize">{selectedPlace.category}</p>
+          {hoveredPlace && hoveredPlace.name === place.name && (
+            <Popup autoPan={false}>
+              <div className="w-64">
+                <div className="relative h-32 w-full rounded-lg overflow-hidden">
+                  <Image src={place.image} alt={place.name} fill style={{objectFit: 'cover'}} />
+                </div>
+                <div className="p-2">
+                  <h3 className="font-bold text-base">{place.name}</h3>
+                  <p className="text-sm capitalize text-slate-500">{place.category}</p>
+                  <div className="flex items-center gap-1 mt-1 text-sm font-semibold">
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <span>{place.rating} Rating</span>
+                  </div>
+                </div>
               </div>
             </Popup>
           )}
