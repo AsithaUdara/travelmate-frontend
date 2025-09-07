@@ -1,11 +1,11 @@
 "use client";
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { mockVehicles } from '@/lib/trip-data';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
-export default function BookVehiclePage() {
+function BookVehiclePageInner() {
   const params = useSearchParams();
   const id = params.get('id');
   const v = mockVehicles.find(m => m.id === id);
@@ -86,3 +86,13 @@ export default function BookVehiclePage() {
   </div>
   );
 }
+
+export default function BookVehiclePage() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading vehicle...</div>}>
+      <BookVehiclePageInner />
+    </Suspense>
+  );
+}
+
+// Config moved to parent server layout

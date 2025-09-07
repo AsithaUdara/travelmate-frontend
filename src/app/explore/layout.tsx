@@ -1,6 +1,9 @@
 import { ExploreHeader } from '@/components/explore/ExploreHeader';
 import { VerticalNav } from '@/components/explore/VerticalNav';
 
+// Force dynamic rendering for Explore route to support client hooks like useSearchParams
+export const dynamic = 'force-dynamic';
+
 export default function ExploreLayout({
   children,
 }: {
