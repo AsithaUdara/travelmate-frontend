@@ -1,4 +1,4 @@
-import  ExploreHeader  from '@/components/explore/ExploreHeader'; // We will reuse the header
+import { ExploreHeader } from '@/components/explore/ExploreHeader'; // We will reuse the header
 import { PlanVerticalNav } from '@/components/plan/PlanVerticalNav'; // A new nav for this section
 
 export default function PlanLayout({
