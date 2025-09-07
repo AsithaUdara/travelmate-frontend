@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Trip, ItineraryDay, Activity } from '@/lib/trip-data';
-import { format } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import { PencilSquareIcon } from '@heroicons/react/24/solid';
@@ -26,6 +26,14 @@ const TimelineActivityCard = ({ activity }: { activity: Activity }) => {
 };
 
 export const ItineraryTimeline = ({ trip, onDaySelect }: ItineraryTimelineProps) => {
+    const safeFormat = (dateStr: string | Date, fmt: string) => {
+      try {
+        const d = typeof dateStr === 'string' ? parseISO(dateStr) : dateStr;
+        return isValid(d) ? format(d, fmt) : String(dateStr);
+      } catch {
+        return String(dateStr);
+      }
+    };
     return (
         <div>
             <div className="mb-6">
@@ -39,7 +47,7 @@ export const ItineraryTimeline = ({ trip, onDaySelect }: ItineraryTimelineProps)
                 </Link>
               </div>
               <p className="text-lg text-slate-500 mt-2">
-                {format(new Date(trip.startDate), 'MMMM d, yyyy')} - {format(new Date(trip.endDate), 'MMMM d, yyyy')}
+                {safeFormat(trip.startDate, 'MMMM d, yyyy')} - {safeFormat(trip.endDate, 'MMMM d, yyyy')}
               </p>
             </div>
             <div className="space-y-2">
@@ -51,7 +59,7 @@ export const ItineraryTimeline = ({ trip, onDaySelect }: ItineraryTimelineProps)
                       </div>
                       <div className="pb-8 flex-1">
                           <button onClick={() => onDaySelect(day)} className="text-left w-full hover:bg-slate-50 p-2 rounded-lg">
-                              <p className="font-semibold text-slate-500">{format(new Date(day.date), 'EEEE, MMMM d')}</p>
+                              <p className="font-semibold text-slate-500">{safeFormat(day.date, 'EEEE, MMMM d')}</p>
                               <h3 className="text-xl font-bold">{day.location}: {day.title}</h3>
                           </button>
                           
