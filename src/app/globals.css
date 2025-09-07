@@ -6,7 +6,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   /* Brand & UI tokens */
-  --color-primary: #ff385c; /* Airbnb-like brand color */
+  --color-primary: #696969; /* Airbnb-like brand color */
   --color-primary-foreground: #ffffff;
   --color-muted: #f3f4f6;
   --color-muted-foreground: #4b5563;
