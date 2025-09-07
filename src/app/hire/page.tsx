@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Car, Users, Search, Filter, Grid, List, Star, Heart, User, Navigation, CheckCircle, Phone, Mail, AlertCircle, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 export default function VehicleBookingDashboard() {
   const router = useRouter();
@@ -303,7 +304,7 @@ export default function VehicleBookingDashboard() {
                       setActiveTab('search');
                       setShowResults(false);
                     }}
-                    className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                    className="bg--600 text-white px-6 py-3 rounded-lg hover:bg-black transition-colors"
                   >
                     Book a Vehicle
                   </button>
@@ -472,7 +473,7 @@ export default function VehicleBookingDashboard() {
                 }}
                 className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'search'
-                    ? 'bg-white text-blue-600 shadow-sm'
+                    ? 'bg-white text-black shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -483,7 +484,7 @@ export default function VehicleBookingDashboard() {
                 onClick={() => setActiveTab('bookings')}
                 className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'bookings'
-                    ? 'bg-white text-blue-600 shadow-sm'
+                    ? 'bg-white text-black shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -542,7 +543,7 @@ export default function VehicleBookingDashboard() {
                     <select
                       value={searchParams.pickupLocation}
                       onChange={(e) => setSearchParams({...searchParams, pickupLocation: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black-500 focus:border-black-500 bg-white"
                     >
                       <option value="">Select pickup location</option>
                       {locations.map(location => (
@@ -560,7 +561,7 @@ export default function VehicleBookingDashboard() {
                     <select
                       value={searchParams.dropoffLocation}
                       onChange={(e) => setSearchParams({...searchParams, dropoffLocation: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black-500 focus:border-black-500 bg-white"
                     >
                       <option value="">Select drop-off location</option>
                       <option value="same">Same as pickup</option>
@@ -579,7 +580,7 @@ export default function VehicleBookingDashboard() {
                     <select
                       value={searchParams.vehicleType}
                       onChange={(e) => setSearchParams({...searchParams, vehicleType: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black-500 focus:border-black-500 bg-white"
                     >
                       <option value="">Any vehicle type</option>
                       {vehicleTypes.map(type => (
@@ -598,7 +599,7 @@ export default function VehicleBookingDashboard() {
                       type="date"
                       value={searchParams.pickupDate}
                       onChange={(e) => setSearchParams({...searchParams, pickupDate: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black-500 focus:border-black-500 bg-white"
                       min={new Date().toISOString().split('T')[0]}
                     />
                   </div>
@@ -613,23 +614,24 @@ export default function VehicleBookingDashboard() {
                       type="time"
                       value={searchParams.pickupTime}
                       onChange={(e) => setSearchParams({...searchParams, pickupTime: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black-500 focus:border-black-500 bg-white"
                     />
                   </div>
                 </div>
 
                 {/* Search Button */}
                 <div className="mt-8">
-                  <button
+                  <Button size="lg"
                     onClick={handleSearch}
                     disabled={!searchParams.pickupLocation || !searchParams.dropoffLocation || 
                     !searchParams.pickupDate || 
                     !searchParams.pickupTime}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 text-lg font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    className="w-full h-14 rounded-full text-lg"
                   >
-                    <Search className="w-5 h-5" />
-                    Search Available Vehicles
-                  </button>
+                    <span className="flex items-center justify-between w-full px-2">
+                        <span> Search Available Vehicles</span>
+                    </span>                    
+                  </Button>
                 </div>
               </div>
             </div>
@@ -691,7 +693,7 @@ export default function VehicleBookingDashboard() {
                   <select
                     value={filters.radius}
                     onChange={(e) => setFilters({...filters, radius: parseInt(e.target.value)})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black-500 bg-white"
                   >
                     <option value={5}>Within 5 km</option>
                     <option value={10}>Within 10 km</option>
@@ -706,7 +708,7 @@ export default function VehicleBookingDashboard() {
                   <select
                     value={filters.vehicleType}
                     onChange={(e) => setFilters({...filters, vehicleType: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black-500 bg-white"
                   >
                     <option value="">All Types</option>
                     {vehicleTypes.map(type => (
@@ -735,7 +737,7 @@ export default function VehicleBookingDashboard() {
                       ...filters, 
                       priceRange: [filters.priceRange[0], parseInt(e.target.value)]
                     })}
-                    className="w-full accent-blue-600"
+                    className="w-full accent-black"
                   />
                 </div>
               </div>
@@ -762,13 +764,13 @@ export default function VehicleBookingDashboard() {
                     <div className="flex border border-gray-300 rounded-lg bg-white">
                       <button
                         onClick={() => setViewMode('grid')}
-                        className={`p-2 ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'text-gray-600'}`}
+                        className={`p-2 ${viewMode === 'grid' ? 'bg-black text-white' : 'text-gray-600'}`}
                       >
                         <Grid className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setViewMode('list')}
-                        className={`p-2 ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'text-gray-600'}`}
+                        className={`p-2 ${viewMode === 'list' ? 'bg-black text-white' : 'text-gray-600'}`}
                       >
                         <List className="w-4 h-4" />
                       </button>
@@ -849,12 +851,11 @@ export default function VehicleBookingDashboard() {
                             </div>
 
                             <div className="flex gap-3">
-                              <button 
+                              <Button size="sm" className="w-full h-10 rounded-full text-sm py-2.5 px-4"
                                 onClick={() => handleBookVehicle(vehicle.id)}
-                                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2.5 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium transform hover:-translate-y-0.5"
                               >
                                 Book Now
-                              </button>
+                              </Button>
                             </div>
                           </div>
                         </div>

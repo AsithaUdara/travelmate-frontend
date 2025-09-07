@@ -21,6 +21,7 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function BookingPage() {
   const router = useRouter();
@@ -248,12 +249,12 @@ export default function BookingPage() {
             </div>
 
             <div className="flex gap-4">
-              <button 
+              <Button 
                 onClick={handleRedirectNow}
-                className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                className="flex-1 bg-black text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
                 Continue Browsing
-              </button>
+              </Button>
               <button 
                 onClick={() => router.push('/hire?tab=bookings')}
                 className="flex-1 border border-gray-300 py-3 px-6 rounded-lg hover:bg-gray-50 transition-colors font-medium"
@@ -309,14 +310,14 @@ export default function BookingPage() {
               {[1, 2, 3].map((step) => (
                 <div key={step} className="flex items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                    step === currentStep ? 'bg-blue-600 text-white' :
-                    step < currentStep ? 'bg-green-600 text-white' :
+                    step === currentStep ? 'bg-black-600 text-white' :
+                    step < currentStep ? 'bg-black-600 text-white' :
                     'bg-gray-300 text-gray-600'
                   }`}>
                     {step < currentStep ? <CheckCircle className="w-5 h-5" /> : step}
                   </div>
                   <span className={`ml-2 text-sm ${
-                    step === currentStep ? 'text-blue-600 font-semibold' :
+                    step === currentStep ? 'text-black-600 font-semibold' :
                     step < currentStep ? 'text-green-600' :
                     'text-gray-500'
                   }`}>
@@ -598,21 +599,21 @@ export default function BookingPage() {
               </button>
               
               {currentStep < 3 ? (
-                <button
+                <Button size="lg"
                   onClick={handleNextStep}
                   disabled={!isStepValid()}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-3 bg-black text-white rounded-lg hover:bg-grey-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Continue
-                </button>
+                </Button>
               ) : (
-                <button
+                <Button
                   onClick={handleConfirmBooking}
                   disabled={!isStepValid()}
-                  className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-3 bg-black text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Confirm Booking
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -620,13 +621,13 @@ export default function BookingPage() {
 
         {/* Mobile Summary Toggle */}
         <div className="lg:hidden">
-          <button
+          <Button
             onClick={() => setShowMobileSummary(!showMobileSummary)}
             className="w-full bg-white p-4 rounded-lg shadow-sm border flex items-center justify-between"
           >
             <span className="font-semibold">Booking Summary</span>
             {showMobileSummary ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-          </button>
+          </Button>
         </div>
 
         {/* Booking Summary Sidebar */}
