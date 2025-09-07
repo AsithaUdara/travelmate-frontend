@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   ArrowLeft, 
@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function BookingPage() {
+function BookingPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const vehicleId = searchParams.get('vehicleId');
@@ -360,3 +360,13 @@ export default function BookingPage() {
     </div>
   );
 }
+
+export default function BookingPage() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading booking...</div>}>
+      <BookingPageInner />
+    </Suspense>
+  );
+}
+
+// Route segment config moved to parent server layout to avoid client/server mismatch

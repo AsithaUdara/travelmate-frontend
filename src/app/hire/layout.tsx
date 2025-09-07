@@ -1,6 +1,11 @@
 import { ExploreHeader } from '@/components/explore/ExploreHeader'; // We will reuse the header
 import { PlanVerticalNav } from '@/components/plan/PlanVerticalNav'; // A new nav for this section
 
+// Ensure dynamic rendering and no caching for pages under /hire
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 export default function PlanLayout({
   children,
 }: {

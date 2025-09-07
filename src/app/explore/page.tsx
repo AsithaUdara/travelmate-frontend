@@ -2,11 +2,11 @@
 
 import React, { useState, Suspense } from 'react';
 import { mockPlaces } from '@/lib/mock-data';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { ResultsPane } from '@/components/explore/ResultsPane';
 
-const ExploreMap = dynamic(() =>
+const ExploreMap = nextDynamic(() =>
   import('@/components/explore/ExploreMap').then(mod => mod.ExploreMap),
   { ssr: false, loading: () => <div className="w-full h-full bg-slate-200 animate-pulse" /> }
 );
@@ -48,6 +48,4 @@ export default function ExplorePage() {
 }
 
 // Avoid prerendering to prevent build error with useSearchParams during static export
-export const revalidate = 0;
-export const fetchCache = 'force-no-store';
-export const dynamicParams = true;
+// Config moved to parent server layout

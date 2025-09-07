@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, Suspense } from 'react';
 import { mockVehicles, Vehicle } from '@/lib/trip-data';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -53,7 +53,7 @@ const ResultCard = ({ v, onBook }: { v: Vehicle; onBook: (v: Vehicle) => void })
   </div>
 );
 
-export default function RentResultsPage() {
+function RentResultsPageInner() {
   const params = useSearchParams();
   const router = useRouter();
   const [sortBy, setSortBy] = useState<'recommended' | 'price-asc' | 'price-desc' | 'distance' | 'rating'>('recommended');
@@ -133,3 +133,13 @@ export default function RentResultsPage() {
     </div>
   );
 }
+
+export default function RentResultsPage() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading results...</div>}>
+      <RentResultsPageInner />
+    </Suspense>
+  );
+}
+
+// Config moved to parent server layout

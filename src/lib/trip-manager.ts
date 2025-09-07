@@ -57,6 +57,9 @@ function migrateTrip(oldTrip: Trip): Trip {
 // Function to save a trip
 export const saveTrip = (tripToSave: Trip): void => {
   try {
+    // Avoid touching localStorage on the server
+    if (typeof window === 'undefined') return;
+
     const existingTrips = getAllTrips();
     // Check if a trip with this ID already exists to prevent duplicates
     const tripIndex = existingTrips.findIndex(trip => trip.id === tripToSave.id);
@@ -68,8 +71,8 @@ export const saveTrip = (tripToSave: Trip): void => {
       // Add new trip
       existingTrips.push(tripToSave);
     }
-    
-    localStorage.setItem(TRIPS_STORAGE_KEY, JSON.stringify(existingTrips));
+
+    window.localStorage.setItem(TRIPS_STORAGE_KEY, JSON.stringify(existingTrips));
   } catch (error) {
     console.error("Failed to save trip:", error);
   }
@@ -78,7 +81,8 @@ export const saveTrip = (tripToSave: Trip): void => {
 // Function to get all saved trips
 export const getAllTrips = (): Trip[] => {
   try {
-    const tripsJson = localStorage.getItem(TRIPS_STORAGE_KEY);
+    if (typeof window === 'undefined') return [];
+    const tripsJson = window.localStorage.getItem(TRIPS_STORAGE_KEY);
     return tripsJson ? JSON.parse(tripsJson) : [];
   } catch (error) {
     console.error("Failed to get all trips:", error);
