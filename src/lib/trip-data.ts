@@ -124,23 +124,14 @@ export interface Vehicle {
   name: string;
   image: string;
   capacity: number; // Number of passengers
-  pricePerDay: number; // LKR per day or estimated total
+  pricePerDay: number;
   location?: string;
-  provider?: string;
-  rating?: number;
-  reviews?: number;
-  transmission?: 'Auto' | 'Manual';
-  fuel?: 'Petrol' | 'Diesel' | 'Hybrid' | 'Electric';
-  driverAvailable?: boolean;
-  features?: string[]; // e.g., ['AC', 'GPS', 'Bluetooth']
-  distanceKm?: number; // from pickup point, for mock sorting/filtering
 }
 
 // --- NEW: Mock data for the "Pick Me" vehicle rental feature ---
 export const mockVehicles: Vehicle[] = [
-  { id: 'v-1', type: 'Car', name: 'Toyota Corolla', image: 'https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?w=900', capacity: 4, pricePerDay: 9000, location: 'Colombo', provider: 'Lanka Car Rentals', rating: 4.7, reviews: 156, transmission: 'Auto', fuel: 'Petrol', driverAvailable: true, features: ['AC', 'GPS', 'Bluetooth', 'USB Charging'], distanceKm: 2.1 },
-  { id: 'v-2', type: 'Van', name: 'Toyota Hiace', image: 'https://images.unsplash.com/photo-1605557626555-0f1f25b50f87?w=900', capacity: 15, pricePerDay: 18600, location: 'Colombo', provider: 'City Transport Services', rating: 4.5, reviews: 89, transmission: 'Manual', fuel: 'Diesel', driverAvailable: true, features: ['AC', 'GPS', 'WiFi', 'Luggage Space'], distanceKm: 1.8 },
-  { id: 'v-3', type: 'Car', name: 'Honda Vezel', image: 'https://images.unsplash.com/photo-1605559424806-6fca9b499d4a?w=900', capacity: 4, pricePerDay: 12000, location: 'Colombo', provider: 'Island Drives', rating: 4.6, reviews: 112, transmission: 'Auto', fuel: 'Hybrid', driverAvailable: true, features: ['AC', 'GPS'], distanceKm: 3.2 },
-  { id: 'v-4', type: 'Tuk-tuk', name: 'Bajaj RE', image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=900', capacity: 3, pricePerDay: 5000, location: 'Colombo', provider: 'Quick Tuk', rating: 4.2, reviews: 64, transmission: 'Manual', fuel: 'Petrol', driverAvailable: false, features: ['AC'], distanceKm: 0.9 },
-  { id: 'v-5', type: 'Van', name: 'Toyota KDH', image: 'https://images.unsplash.com/photo-1599420622023-c2c58612140b?w=900', capacity: 9, pricePerDay: 15000, location: 'Kandy', provider: 'Hill Country Vans', rating: 4.4, reviews: 73, transmission: 'Auto', fuel: 'Diesel', driverAvailable: true, features: ['AC', 'Bluetooth'], distanceKm: 2.7 },
+  { id: 'v-1', type: 'Car', name: 'Toyota Prius', image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=500', capacity: 4, pricePerDay: 10000, location: 'Colombo' },
+  { id: 'v-2', type: 'Car', name: 'Honda Vezel', image: 'https://images.unsplash.com/photo-1616421292021-933deb6682a2?w=500', capacity: 4, pricePerDay: 12000, location: 'Colombo' },
+  { id: 'v-3', type: 'Van', name: 'Toyota KDH', image: 'https://images.unsplash.com/photo-1599420622023-c2c58612140b?w=500', capacity: 9, pricePerDay: 15000, location: 'Kandy' },
+  { id: 'v-4', type: 'Tuk-tuk', name: 'Bajaj RE', image: 'https://images.unsplash.com/photo-1598403337953-83f5117e3b91?w=500', capacity: 3, pricePerDay: 5000, location: 'Ella' },
 ];
