@@ -105,7 +105,7 @@ export default function HotelDetailPage({ params }: { params: Promise<{ id: stri
 
         {/* Image Gallery (safe fallbacks, only render existing images) */}
         {(() => {
-          const fallback = "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800";
+          const fallback = "/hero/hero-1.jpg";
           const gallery = (place!.images || []).filter(Boolean);
           const primary = gallery[0] || fallback;
           const others = gallery.slice(1, 5);

@@ -3,13 +3,20 @@
 import React from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { getAllTrips } from '@/lib/trip-manager';
-import { format } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 
 export default function PlannerCalendarPage() {
   const trips = getAllTrips();
   const active = trips[0];
 
-  const dates = (active?.days || []).map(d => new Date(d.date));
+  const dates = (active?.days || [])
+    .map(d => {
+      // Try ISO parse first; fallback to Date
+      const byIso = parseISO(d.date as any);
+      const byNew = new Date(d.date as any);
+      return isValid(byIso) ? byIso : byNew;
+    })
+    .filter(d => isValid(d));
 
   return (
     <div className="p-6">
@@ -22,7 +29,14 @@ export default function PlannerCalendarPage() {
         <div className="mt-6 space-y-2">
           {active.days.map(d => (
             <div key={d.day} className="p-3 rounded-lg border bg-white">
-              <p className="font-semibold">{format(new Date(d.date), 'PPP')}: Day {d.day} - {d.location} • {d.title}</p>
+              <p className="font-semibold">
+                {(() => {
+                  const dtIso = parseISO(d.date as any);
+                  const dtNew = new Date(d.date as any);
+                  const dt = isValid(dtIso) ? dtIso : dtNew;
+                  return isValid(dt) ? format(dt, 'PPP') : d.date;
+                })()}: Day {d.day} - {d.location} • {d.title}
+              </p>
             </div>
           ))}
         </div>

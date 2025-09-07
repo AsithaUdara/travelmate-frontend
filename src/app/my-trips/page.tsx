@@ -17,8 +17,8 @@ const TripCard = ({ trip }: { trip: Trip }) => {
     return (
         <Link href={`/trip/${trip.id}`} className="block border rounded-xl shadow-sm hover:shadow-lg transition-shadow overflow-hidden group">
             <div className="relative h-48 w-full">
-                {/* In a real app, this would be a map snapshot or a cover photo */}
-                <Image src="https://images.unsplash.com/photo-1598403337953-83f5117e3b91?w=500" alt={trip.name} fill style={{objectFit: 'cover'}} className="transition-transform duration-300 group-hover:scale-105"/>
+                {/* Use a local cover image to ensure reliability */}
+                <Image src="/gallery/gallery-1.jpg" alt={trip.name} fill style={{objectFit: 'cover'}} className="transition-transform duration-300 group-hover:scale-105"/>
             </div>
             <div className="p-4 bg-white">
                 <h2 className="font-bold text-lg truncate">{trip.name}</h2>

@@ -15,7 +15,7 @@ function ExplorePageContent() {
   const [hoveredPlaceId, setHoveredPlaceId] = useState<string | null>(null);
   
   const searchParams = useSearchParams();
-  const category = (searchParams.get('category') || 'stay') as 'stay' | 'activity' | 'eat' | 'flight' | 'sights';
+  const category = (searchParams.get('category') || 'sights') as 'stay' | 'activity' | 'eat' | 'flight' | 'sights';
 
   const filteredPlaces = mockPlaces.filter(p => p.category === category);
 

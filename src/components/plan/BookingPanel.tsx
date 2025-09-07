@@ -40,52 +40,14 @@ export const BookingPanel = ({ place }: { place: Place }) => {
     };
     
     const handleProceedToPayment = () => {
-        // Simulate AI-assisted confirmation and persist booking into the draft trip.
-        try {
-            const locName = inferLocationFromPlace(place.name);
-            const bestDayIndex = findBestDayIndex();
-            // Build activity once for reuse
-            const activity = {
-                id: `acc-${place.id}`,
-                name: `✅ Check in: ${place.name}`,
-                type: 'Accommodation',
-                duration: 0,
-                cost: place.price,
-                bookingDetails: {
-                    reference: `BK-${place.id.toUpperCase()}`,
-                    checkIn: checkIn ? format(checkIn, 'yyyy-MM-dd') : undefined,
-                    checkOut: checkOut ? format(checkOut, 'yyyy-MM-dd') : undefined,
-                    guests,
-                    nights: numberOfNights,
-                    total: totalPrice,
-                },
-            } as any;
-            const updatedDays = trip.days.map((d, i) => {
-                const matchesByName = locName && d.location.toLowerCase().includes(locName);
-                const matchesByProximity = !locName && i === bestDayIndex;
-                if (matchesByName || matchesByProximity) {
-                    const withoutOld = d.activities.filter(a => a.type !== 'Accommodation');
-                    return { ...d, activities: [...withoutOld, activity] };
-                }
-                return d;
-            });
-            const updatedTrip = { ...trip, days: updatedDays };
-            setTrip(updatedTrip);
-            try {
-                // Remember the last accommodation location so the sidebar can preselect it
-                const matchedDay = updatedTrip.days.find(d => d.activities.some(a => a.id === activity.id));
-                if (matchedDay) {
-                    localStorage.setItem('tm_accommodation_selected_location', matchedDay.location);
-                }
-                localStorage.setItem('tm_plan_started', '1');
-                localStorage.setItem('tm_plan_step', '3');
-                document.dispatchEvent(new CustomEvent('tm:plan-started'));
-                document.dispatchEvent(new CustomEvent('tm:plan-step', { detail: { step: 3 } }));
-            } catch {}
-            alert('Booking confirmed in your plan.');
-            // Navigate to Accommodation step to show the booked hotel in the sidebar
-            router.push('/plan/accommodation');
-        } catch {}
+        // Navigate to the multi-step booking flow, carrying the selected dates and guests
+        if (!checkIn || !checkOut || numberOfNights <= 0) return;
+        const qs = new URLSearchParams({
+            checkIn: format(checkIn, 'yyyy-MM-dd'),
+            checkOut: format(checkOut, 'yyyy-MM-dd'),
+            guests: String(guests),
+        }).toString();
+        router.push(`/plan/hotel/${place.id}/booking?${qs}`);
     };
 
     const inferLocationFromPlace = (hotelName: string) => {
