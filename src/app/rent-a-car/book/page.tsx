@@ -1,7 +1,6 @@
 "use client";
 
 import React from 'react';
-import { ExploreHeader } from '@/components/explore/ExploreHeader';
 import { mockVehicles } from '@/lib/trip-data';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -13,22 +12,14 @@ export default function BookVehiclePage() {
 
   if (!v) {
     return (
-      <div className="h-screen w-screen flex flex-col bg-slate-50">
-        <ExploreHeader />
-        <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto py-12 px-4">
-            <div className="text-center text-slate-600">Vehicle not found.</div>
-          </div>
-        </main>
+      <div className="container mx-auto py-12 px-4">
+        <div className="text-center text-slate-600">Vehicle not found.</div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-slate-50">
-      <ExploreHeader />
-      <main className="flex-1 overflow-y-auto">
-        <div className="container mx-auto py-6 px-4 grid grid-cols-12 gap-4">
+    <div className="container mx-auto py-6 px-4 grid grid-cols-12 gap-4">
           <div className="col-span-8">
             <div className="bg-white border rounded-xl p-4">
               <h2 className="font-bold text-xl mb-4">Complete Your Booking</h2>
@@ -92,8 +83,6 @@ export default function BookVehiclePage() {
               </div>
             </div>
           </div>
-        </div>
-      </main>
-    </div>
+  </div>
   );
 }

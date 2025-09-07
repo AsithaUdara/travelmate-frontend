@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState } from 'react';
-import { ExploreHeader } from '@/components/explore/ExploreHeader';
 import { mockVehicles, Vehicle } from '@/lib/trip-data';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -36,7 +35,7 @@ const ResultCard = ({ v, onBook }: { v: Vehicle; onBook: (v: Vehicle) => void })
               <span className="font-normal text-slate-600">({v.reviews} reviews)</span>
             </div>
             <div className="mt-2 flex flex-wrap gap-2">
-              {v.features?.map(f => (
+              {v.features?.map((f: string) => (
                 <span key={f} className="text-xs bg-slate-100 px-2 py-0.5 rounded-full">{f}</span>
               ))}
             </div>
@@ -81,10 +80,7 @@ export default function RentResultsPage() {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-slate-50">
-      <ExploreHeader />
-      <main className="flex-1 overflow-y-auto">
-        <div className="container mx-auto py-6 px-4">
+    <div className="container mx-auto py-6 px-4">
           <h1 className="text-2xl font-bold">Available Vehicles</h1>
           <div className="mt-4 grid grid-cols-12 gap-4">
             {/* Filters */}
@@ -134,8 +130,6 @@ export default function RentResultsPage() {
               </div>
             </section>
           </div>
-        </div>
-      </main>
     </div>
   );
 }

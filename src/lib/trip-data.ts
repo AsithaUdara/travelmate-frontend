@@ -126,12 +126,85 @@ export interface Vehicle {
   capacity: number; // Number of passengers
   pricePerDay: number;
   location?: string;
+  // Extended fields for richer Rent a Car UI
+  provider?: string;
+  distanceKm?: number;
+  fuel?: string;
+  transmission?: string;
+  driverAvailable?: boolean;
+  rating?: number;
+  reviews?: number;
+  features?: string[];
 }
 
 // --- NEW: Mock data for the "Pick Me" vehicle rental feature ---
 export const mockVehicles: Vehicle[] = [
-  { id: 'v-1', type: 'Car', name: 'Toyota Prius', image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=500', capacity: 4, pricePerDay: 10000, location: 'Colombo' },
-  { id: 'v-2', type: 'Car', name: 'Honda Vezel', image: 'https://images.unsplash.com/photo-1616421292021-933deb6682a2?w=500', capacity: 4, pricePerDay: 12000, location: 'Colombo' },
-  { id: 'v-3', type: 'Van', name: 'Toyota KDH', image: 'https://images.unsplash.com/photo-1599420622023-c2c58612140b?w=500', capacity: 9, pricePerDay: 15000, location: 'Kandy' },
-  { id: 'v-4', type: 'Tuk-tuk', name: 'Bajaj RE', image: 'https://images.unsplash.com/photo-1598403337953-83f5117e3b91?w=500', capacity: 3, pricePerDay: 5000, location: 'Ella' },
+  {
+    id: 'v-1',
+    type: 'Car',
+    name: 'Toyota Prius',
+    image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=500',
+    capacity: 4,
+    pricePerDay: 10000,
+    location: 'Colombo',
+    provider: 'Local Hirers',
+    distanceKm: 2.3,
+    fuel: 'Hybrid',
+    transmission: 'Auto',
+    driverAvailable: true,
+    rating: 4.6,
+    reviews: 132,
+    features: ['A/C', 'Bluetooth', 'USB']
+  },
+  {
+    id: 'v-2',
+    type: 'Car',
+    name: 'Honda Vezel',
+    image: 'https://images.unsplash.com/photo-1616421292021-933deb6682a2?w=500',
+    capacity: 4,
+    pricePerDay: 12000,
+    location: 'Colombo',
+    provider: 'City Rentals',
+    distanceKm: 4.1,
+    fuel: 'Petrol',
+    transmission: 'Auto',
+    driverAvailable: true,
+    rating: 4.7,
+    reviews: 210,
+    features: ['A/C', 'Reverse Camera', 'Cruise Control']
+  },
+  {
+    id: 'v-3',
+    type: 'Van',
+    name: 'Toyota KDH',
+    image: 'https://images.unsplash.com/photo-1599420622023-c2c58612140b?w=500',
+    capacity: 9,
+    pricePerDay: 15000,
+    location: 'Kandy',
+    provider: 'Central Vans',
+    distanceKm: 1.8,
+    fuel: 'Diesel',
+    transmission: 'Manual',
+    driverAvailable: true,
+    rating: 4.4,
+    reviews: 89,
+    features: ['A/C', 'Large Boot', 'USB']
+  },
+  {
+    id: 'v-4',
+    type: 'Tuk-tuk',
+    name: 'Bajaj RE',
+    image: 'https://images.unsplash.com/photo-1598403337953-83f5117e3b91?w=500',
+    capacity: 3,
+    pricePerDay: 5000,
+    location: 'Ella',
+    provider: 'Hill Ride',
+    distanceKm: 0.9,
+    fuel: 'Petrol',
+    transmission: 'Manual',
+    driverAvailable: false,
+    rating: 4.1,
+    reviews: 54,
+    features: ['Open Sides', 'City Friendly']
+  },
 ];
