@@ -1,8 +1,11 @@
+"use client";
+
 import React from 'react';
 import { Place } from '@/lib/mock-data';
 import Image from 'next/image';
 import { Button } from '../ui/button';
-import { BookmarkIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { StarIcon } from '@heroicons/react/24/solid';
+import { useRouter } from 'next/navigation';
 
 type MapHoverCardProps = {
   place: Place;
@@ -11,6 +14,7 @@ type MapHoverCardProps = {
 
 export const MapHoverCard = ({ place, position }: MapHoverCardProps) => {
   if (!place || !position) return null;
+  const router = useRouter();
 
   return (
     <div
@@ -23,14 +27,14 @@ export const MapHoverCard = ({ place, position }: MapHoverCardProps) => {
     >
       <div className="relative h-40 w-full">
         <Image src={place.images[0]} alt={place.name} fill style={{ objectFit: 'cover' }} />
-        <div className="absolute top-2 right-2 flex gap-2">
-            <Button size="icon" variant="secondary" className="h-8 w-8 rounded-full bg-white/80 hover:bg-white">
-                <PlusIcon className="h-5 w-5"/>
-            </Button>
-            <Button size="icon" variant="secondary" className="h-8 w-8 rounded-full bg-white/80 hover:bg-white">
-                <BookmarkIcon className="h-5 w-5"/>
-            </Button>
-        </div>
+        {/* Overlay actions removed as requested */}
+        {/* Rating badge on image */}
+        {place.rating ? (
+          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-green-100 text-green-800 font-semibold text-xs px-2 py-1 rounded-full shadow">
+            {place.rating}
+            <StarIcon className="h-4 w-4" />
+          </div>
+        ) : null}
       </div>
       <div className="p-3">
         <p className="text-xs text-slate-500">{place.type}</p>
@@ -42,11 +46,20 @@ export const MapHoverCard = ({ place, position }: MapHoverCardProps) => {
             <span className="text-sm font-normal text-slate-500"> / {place.priceType}</span>
           </p>
         )}
-        <div className="flex items-center justify-between mt-4">
-          <Button variant="outline" className="rounded-full font-semibold">Add To Trip</Button>
+        <div className="flex items-center justify-end mt-4">
           {/* Conditionally render Book Now button */}
           {place.category !== 'sights' && place.category !== 'atm' && (
-            <Button className="rounded-full font-semibold bg-slate-900 hover:bg-slate-800">Book now</Button>
+            <Button
+              className="rounded-full font-semibold bg-slate-900 hover:bg-slate-800"
+              onClick={() => {
+                // For stays, navigate to the plan hotel details page
+                if (place.category === 'stay') {
+                  router.push(`/plan/hotel/${place.id}`);
+                }
+              }}
+            >
+              Book now
+            </Button>
           )}
         </div>
       </div>

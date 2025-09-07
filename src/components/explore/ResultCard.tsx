@@ -9,12 +9,17 @@ type ResultCardProps = {
   place: Place;
   onHover: (placeId: string | null) => void;
   isHovered: boolean;
+  isRecommended?: boolean;
 };
 
-export const ResultCard = ({ place, onHover, isHovered }: ResultCardProps) => {
+export const ResultCard = ({ place, onHover, isHovered, isRecommended = false }: ResultCardProps) => {
   return (
     <div 
-      className={cn("flex gap-4 border rounded-xl shadow-sm transition-all duration-300", isHovered ? "scale-105 shadow-xl z-10" : "")}
+      className={cn(
+  "flex gap-4 border shadow-sm transition-all duration-300",
+        isHovered ? "scale-105 shadow-xl z-10" : "",
+  isRecommended ? "border-2 border-slate-900 rounded-none" : "rounded-xl"
+      )}
       onMouseEnter={() => onHover(place.id)}
       onMouseLeave={() => onHover(null)}
     >
@@ -23,7 +28,7 @@ export const ResultCard = ({ place, onHover, isHovered }: ResultCardProps) => {
           <CarouselContent className="h-full">
             {place.images.map((img, index) => (
               <CarouselItem key={index} className="relative">
-                <Image src={img} alt={place.name} fill style={{objectFit: 'cover'}} className="rounded-l-xl" />
+    <Image src={img} alt={place.name} fill style={{objectFit: 'cover'}} className={cn(isRecommended ? "" : "rounded-l-xl")} />
               </CarouselItem>
             ))}
           </CarouselContent>
@@ -31,7 +36,7 @@ export const ResultCard = ({ place, onHover, isHovered }: ResultCardProps) => {
           <CarouselNext className="right-2 opacity-0 group-hover:opacity-100" />
         </Carousel>
       </div>
-      <div className="p-3 bg-white flex flex-col justify-between flex-grow">
+      <div className={cn("p-3 bg-white flex flex-col justify-between flex-grow", isRecommended ? "" : "rounded-r-xl") }>
         <div>
           <p className="text-sm text-slate-500">{place.type}</p>
           <h3 className="font-bold text-lg truncate">{place.name}</h3>

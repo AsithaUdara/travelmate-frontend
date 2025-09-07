@@ -1,15 +1,25 @@
+"use client";
+
 import Link from 'next/link';
-import { Button } from '@/components/atoms/Button';
-import { Input } from '@/components/atoms/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 
 export default function SignInPage() {
+	const router = useRouter();
+	const onSubmit: React.FormEventHandler<HTMLFormElement> = useCallback((e) => {
+		e.preventDefault();
+		try { localStorage.setItem('tm_is_authenticated', 'true'); } catch {}
+		router.push('/plan');
+	}, [router]);
 	return (
 		<div className="space-y-6">
 			<div className="text-center">
 				<h1 className="text-3xl font-bold text-slate-900">Sign in</h1>
 				<p className="text-slate-500">Welcome back to TravelMate.lk</p>
 			</div>
-			<form className="space-y-4">
+			<form className="space-y-4" onSubmit={onSubmit}>
 				<div>
 					<label htmlFor="email" className="text-sm font-medium text-slate-700">Email</label>
 					<Input id="email" type="email" placeholder="you@example.com" required className="mt-1" />

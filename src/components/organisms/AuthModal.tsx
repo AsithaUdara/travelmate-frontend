@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { GoogleIcon } from '@/components/icons/GoogleIcon';
 import { FacebookIcon } from '@/components/icons/FacebookIcon'; // Make sure this exists
 import { Mail, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type AuthModalProps = {
   isOpen: boolean;
@@ -18,12 +19,26 @@ type AuthModalProps = {
 export const AuthModal = ({ isOpen, setIsOpen, initialView }: AuthModalProps) => {
   const [view, setView] = useState(initialView);
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setView(initialView);
   }, [initialView]);
 
   if (!isOpen) return null;
+
+  const handleAuthSuccess = () => {
+    try {
+      localStorage.setItem('tm_is_authenticated', 'true');
+    } catch {}
+    setIsOpen(false);
+    router.push('/plan');
+  };
+
+  const onSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+    handleAuthSuccess();
+  };
 
   return (
       <div className="fixed inset-0 z-[110]">
@@ -38,7 +53,7 @@ export const AuthModal = ({ isOpen, setIsOpen, initialView }: AuthModalProps) =>
               {view === 'login' ? 'Log in to TravelMate' : 'Create your account'}
             </h2>
 
-            <form className="grid gap-4 mt-4">
+            <form className="grid gap-4 mt-4" onSubmit={onSubmit}>
               {view === 'signup' && (
                 <div className="relative">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
@@ -79,13 +94,13 @@ export const AuthModal = ({ isOpen, setIsOpen, initialView }: AuthModalProps) =>
             </div>
 
             <div className="grid gap-3">
-              <Button variant="outline" size="lg" className="relative w-full h-12 rounded-full px-4 border-slate-200">
+              <Button type="button" variant="outline" size="lg" className="relative w-full h-12 rounded-full px-4 border-slate-200" onClick={handleAuthSuccess}>
                 <span className="absolute left-6 top-1/2 -translate-y-1/2 inline-flex items-center" aria-hidden="true">
                   <GoogleIcon />
                 </span>
                 <span className="block w-full pl-12 pr-6 text-center text-base font-semibold">Continue with Google</span>
               </Button>
-              <Button variant="outline" size="lg" className="relative w-full h-12 rounded-full px-4 border-slate-200">
+              <Button type="button" variant="outline" size="lg" className="relative w-full h-12 rounded-full px-4 border-slate-200" onClick={handleAuthSuccess}>
                 <span className="absolute left-6 top-1/2 -translate-y-1/2 inline-flex items-center" aria-hidden="true">
                   <FacebookIcon />
                 </span>

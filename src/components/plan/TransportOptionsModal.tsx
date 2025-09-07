@@ -48,8 +48,9 @@ export const TransportOptionsModal = ({ isOpen, setIsOpen, options, from, to, on
                     <SparklesIcon className="h-4 w-4" /> AI Recommended
                   </div>
                 )}
-                <h3 className="text-lg font-bold">{option.type}</h3>
-                <p className="text-sm text-slate-600 mt-1">{option.details}</p>
+                  <h3 className="text-lg font-bold">{option.name}</h3>
+                  <p className="text-xs uppercase tracking-wide text-slate-500 mt-0.5">{option.category}</p>
+                  <p className="text-sm text-slate-600 mt-1">{option.details}</p>
                 <div className="mt-4 space-y-2 text-sm">
                   <div className="flex items-center gap-2"><ClockIcon className="h-5 w-5" /> ~{option.time} hours</div>
                   <div className="flex items-center gap-2"><TagIcon className="h-5 w-5" /> LKR {option.cost.toLocaleString()}</div>

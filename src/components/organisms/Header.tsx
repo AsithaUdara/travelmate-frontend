@@ -4,11 +4,12 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Plane, ArrowRight } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { AuthModal } from './AuthModal'; // Import the new modal
 
 const Header = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const isLandingPage = pathname === '/';
   const [scrolled, setScrolled] = useState(!isLandingPage);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -69,6 +70,21 @@ const Header = () => {
                 Sign Up <ArrowRight className="h-4 w-4" />
               </span>
             </Button>
+            {!isLandingPage && (
+              <Button
+                variant="outline"
+                className="rounded-full"
+                onClick={() => {
+                  try {
+                    // Optional: clear any demo auth/session keys
+                    localStorage.removeItem('tm_is_authenticated');
+                  } catch {}
+                  router.push('/');
+                }}
+              >
+                Logout
+              </Button>
+            )}
           </div>
         </div>
       </header>

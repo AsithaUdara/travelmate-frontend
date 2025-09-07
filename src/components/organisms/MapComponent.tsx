@@ -63,7 +63,7 @@ export const MapComponent = ({ places }: MapComponentProps) => {
             <Popup autoPan={false}>
               <div className="w-64">
                 <div className="relative h-32 w-full rounded-lg overflow-hidden">
-                  <Image src={place.image} alt={place.name} fill style={{objectFit: 'cover'}} />
+                  <Image src={(place.images && place.images[0]) || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'} alt={place.name} fill style={{objectFit: 'cover'}} />
                 </div>
                 <div className="p-2">
                   <h3 className="font-bold text-base">{place.name}</h3>
