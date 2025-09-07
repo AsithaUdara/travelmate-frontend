@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, Suspense } from 'react';
-import { mockPlaces, Place } from '@/lib/mock-data';
+import { mockPlaces } from '@/lib/mock-data';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { ResultsPane } from '@/components/explore/ResultsPane';
@@ -46,3 +46,8 @@ export default function ExplorePage() {
     </Suspense>
   );
 }
+
+// Avoid prerendering to prevent build error with useSearchParams during static export
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+export const dynamicParams = true;
