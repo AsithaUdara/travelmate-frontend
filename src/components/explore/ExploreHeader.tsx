@@ -2,12 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { UserCircleIcon, ChatBubbleOvalLeftEllipsisIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/solid';
 import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
 
-export const ExploreHeader = () => {
+const ExploreHeader = () => {
   const pathname = usePathname();
 
   // This function checks if the current URL starts with a given path
@@ -18,45 +15,50 @@ export const ExploreHeader = () => {
       <div className="container mx-auto flex items-center justify-between p-4">
         <div>
           <h1 className="font-bold text-xl">
-            {isActive('/plan') ? 'Plan Your Trip' : 'Near Me'}
+            {isActive('/plan') ? 'Plan Your Trip' : 
+             isActive('/explore') ? 'Near Me' : 
+             isActive('/hire') ? 'Pick Me' : 
+             isActive('/favorites') ? 'My Favourite' : 'Explore'}
           </h1>
         </div>
 
         <nav className="flex items-center gap-1 bg-slate-100 p-1 rounded-full">
           <Link href="/plan">
-            <Button variant="ghost" className={cn("rounded-full font-semibold", isActive('/plan') && "bg-white shadow-sm text-slate-900")}>
+            <button className={`px-4 py-2 rounded-full font-semibold text-sm ${isActive('/plan') ? 'bg-white shadow-sm text-slate-900' : 'text-slate-600'}`}>
               Plan your trip
-            </Button>
+            </button>
           </Link>
           <Link href="/explore">
-            <Button variant="ghost" className={cn("rounded-full font-semibold", isActive('/explore') && "bg-white shadow-sm text-slate-900")}>
+            <button className={`px-4 py-2 rounded-full font-semibold text-sm ${isActive('/explore') ? 'bg-white shadow-sm text-slate-900' : 'text-slate-600'}`}>
               Near me
-            </Button>
+            </button>
           </Link>
           <Link href="/hire">
-            <Button variant="ghost" className="rounded-full font-semibold">
+            <button className={`px-4 py-2 rounded-full font-semibold text-sm ${isActive('/hire') ? 'bg-white shadow-sm text-slate-900' : 'text-slate-600'}`}>
               Pick me
-            </Button>
+            </button>
           </Link>
           <Link href="/favorites">
-            <Button variant="ghost" className="rounded-full font-semibold">
+            <button className={`px-4 py-2 rounded-full font-semibold text-sm ${isActive('/favorites') ? 'bg-white shadow-sm text-slate-900' : 'text-slate-600'}`}>
               My Favourite
-            </Button>
+            </button>
           </Link>
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <ChatBubbleOvalLeftEllipsisIcon className="h-6 w-6" />
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <UserCircleIcon className="h-6 w-6" />
-          </Button>
-           <Button variant="ghost" size="icon" className="rounded-full">
-            <ArrowLeftOnRectangleIcon className="h-6 w-6" />
-          </Button>
+          <button className="p-2 rounded-full hover:bg-slate-100">
+            <i className="fas fa-comment text-slate-600"></i>
+          </button>
+          <button className="p-2 rounded-full hover:bg-slate-100">
+            <i className="fas fa-user-circle text-slate-600"></i>
+          </button>
+          <button className="p-2 rounded-full hover:bg-slate-100">
+            <i className="fas fa-sign-out-alt text-slate-600"></i>
+          </button>
         </div>
       </div>
     </header>
   );
 };
+
+export default ExploreHeader;

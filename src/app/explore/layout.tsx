@@ -1,4 +1,4 @@
-import { ExploreHeader } from '@/components/explore/ExploreHeader';
+import  ExploreHeader  from '@/components/explore/ExploreHeader';
 import { VerticalNav } from '@/components/explore/VerticalNav';
 
 export default function ExploreLayout({
