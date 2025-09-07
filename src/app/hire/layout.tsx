@@ -18,4 +18,4 @@ export default function PlanLayout({
       </div>
     </div>
   );
-}
+} 
