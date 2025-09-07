@@ -13,8 +13,9 @@ type MapHoverCardProps = {
 };
 
 export const MapHoverCard = ({ place, position }: MapHoverCardProps) => {
-  if (!place || !position) return null;
   const router = useRouter();
+  if (!place) return null;
+  if (!position) return null;
 
   return (
     <div
