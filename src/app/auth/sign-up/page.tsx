@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
+
 export default function SignUpPage() {
 	const router = useRouter();
 	const onSubmit: React.FormEventHandler<HTMLFormElement> = useCallback((e) => {
