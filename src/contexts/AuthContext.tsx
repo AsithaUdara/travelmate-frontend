@@ -1,9 +1,34 @@
 "use client";
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
+import { auth } from "@/lib/firbase";
 
-type AuthContextValue = { user: null };
-const AuthContext = createContext<AuthContextValue>({ user: null });
+type AuthContextValue = {
+  user: FirebaseUser | null;
+  loading: boolean;
+};
+
+const AuthContext = createContext<AuthContextValue>({ user: null, loading: true });
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  return <AuthContext.Provider value={{ user: null }}>{children}</AuthContext.Provider>;
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
-export function useAuth() { return useContext(AuthContext); }
+
+export function useAuth() {
+  return useContext(AuthContext);
+}

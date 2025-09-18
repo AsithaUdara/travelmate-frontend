@@ -9,7 +9,8 @@ import { TransportView } from '@/components/plan/TransportView';
 import { AccommodationView } from '@/components/plan/AccommodationView';
 import { PlanActions } from '@/components/plan/PlanActions';
 import { SaveTripModal } from '@/components/plan/SaveTripModal';
-import { mockTrip, Trip } from '@/lib/trip-data';
+import { Trip } from '@/lib/trip-data';
+import { useDraftTrip } from '@/lib/draft-trip';
 import { saveTrip } from '@/lib/trip-manager';
 import { toast } from "sonner";
 import { useRouter } from 'next/navigation';
@@ -25,7 +26,7 @@ const NEXT_BUTTON_TEXTS = ['Next: Plan Transport', 'Next: Book Accommodation', '
 function PlanPageContent() {
   const router = useRouter();
   const [isPlanningStarted, setIsPlanningStarted] = useState(false);
-  const [trip, setTrip] = useState<Trip>({ ...mockTrip, name: "Udara's Sri Lankan Adventure" });
+  const [trip, setTrip] = useDraftTrip();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
