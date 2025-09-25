@@ -1,23 +1,51 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { notFound } from "next/navigation";
-import { mockPlaces } from "@/lib/mock-data";
-import { useDraftTrip } from "@/lib/draft-trip";
-import { format, parseISO, differenceInDays } from "date-fns";
-import { Button } from "@/components/ui/button";
-import { CheckCircle, ArrowLeft, CreditCard, Info, Star, Users, Calendar as CalIcon } from "lucide-react";
+import React, { useState, useEffect, useMemo, use } from 'react';
+import { useRouter, useSearchParams, notFound } from 'next/navigation';
+import { useDraftTrip } from '@/lib/draft-trip';
+import { format, parseISO, differenceInDays } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, ArrowLeft, CreditCard, Info, Star, Users, Calendar as CalIcon } from 'lucide-react';
+import { Place } from '@/lib/mock-data'; 
+import { Activity } from '@/lib/trip-data';
 
 export default function HotelBookingPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const { id } = React.use(params);
+  const { id } = use(params);
   const searchParams = useSearchParams();
   const [trip, setTrip] = useDraftTrip();
 
-  const place = useMemo(() => mockPlaces.find(p => p.id === id && p.category === 'stay'), [id]);
+  const [place, setPlace] = useState<Place | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Prefill from query
+  useEffect(() => {
+    if (!id) return;
+    const fetchHotelDetails = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`http://localhost:5000/api/accommodations/${id}`);
+        if (!response.ok) throw new Error('Could not find the requested hotel.');
+        const data = await response.json();
+        const formattedData: Place = {
+          ...data,
+          id: data._id,
+          category: 'stay',
+          latitude: data.coordinates?.lat,
+          longitude: data.coordinates?.lng,
+        };
+        setPlace(formattedData);
+      } catch (err) {
+        setError('Failed to load hotel details.');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchHotelDetails();
+  }, [id]);
+
   const qCheckIn = searchParams.get('checkIn');
   const qCheckOut = searchParams.get('checkOut');
   const qGuests = parseInt(searchParams.get('guests') || '2', 10);
@@ -42,9 +70,7 @@ export default function HotelBookingPage({ params }: { params: Promise<{ id: str
       const d2 = parseISO(checkOut);
       const n = differenceInDays(d2, d1);
       return Math.max(0, n);
-    } catch {
-      return 0;
-    }
+    } catch { return 0; }
   }, [checkIn, checkOut]);
 
   const basePrice = (place?.price || 0) * nights;
@@ -54,8 +80,8 @@ export default function HotelBookingPage({ params }: { params: Promise<{ id: str
 
   useEffect(() => {
     if (!bookingConfirmed) return;
-    const t = setInterval(() => setCountdown(prev => Math.max(0, prev - 1)), 1000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setCountdown(prev => Math.max(0, prev - 1)), 1000);
+    return () => clearInterval(timer);
   }, [bookingConfirmed]);
 
   useEffect(() => {
@@ -66,28 +92,60 @@ export default function HotelBookingPage({ params }: { params: Promise<{ id: str
 
   const isStepValid = () => {
     switch (currentStep) {
-      case 1:
-        return !!(customerName && customerPhone && nights > 0 && guests > 0);
-      case 2:
-        return paymentMethod === 'card' || paymentMethod === 'cash';
-      case 3:
-        return agreedToTerms && agreedToPolicy;
-      default:
-        return false;
+      case 1: return !!(customerName && customerPhone && nights > 0 && guests > 0);
+      case 2: return paymentMethod === 'card' || paymentMethod === 'cash';
+      case 3: return agreedToTerms && agreedToPolicy;
+      default: return false;
     }
   };
 
-  const handleConfirm = () => {
-    // Persist booking into the draft trip as an Accommodation activity
-  try {
-      const activity: any = {
-    id: `acc-${place?.id ?? 'unknown'}`,
-    name: `✅ Check in: ${place?.name ?? 'Hotel'}`,
+  // --- UPDATE: This function is now async and sends data to the backend ---
+  const handleConfirm = async () => {
+    if (!place || !trip || !isStepValid()) return;
+
+    // 1. Prepare the data payload for the backend API
+    const bookingData = {
+      hotelId: place.id,
+      customerName,
+      customerPhone,
+      checkInDate: checkIn,
+      checkOutDate: checkOut,
+      numberOfGuests: guests,
+      numberOfNights: nights,
+      priceDetails: {
+        basePrice,
+        serviceFee,
+        taxes,
+        totalAmount: totalPrice,
+      },
+      paymentMethod,
+      specialRequests,
+    };
+
+    try {
+      // 2. Send the booking data to the backend
+      const response = await fetch('http://localhost:5000/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookingData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to confirm booking.');
+      }
+
+      // --- If backend save is successful, continue with frontend logic ---
+
+      // 3. Create activity for the local trip plan
+      const activity: Activity = {
+        id: `acc-${place.id}-${Date.now()}`, // Unique ID
+        name: `✅ Check in: ${place.name}`,
         type: 'Accommodation',
         duration: 0,
-    cost: place?.price ?? 0,
+        cost: place.price,
         bookingDetails: {
-      reference: `BK-${(place?.id ?? 'UNKNOWN').toUpperCase()}`,
+          reference: `BK-${place.id.slice(-6).toUpperCase()}`,
           checkIn,
           checkOut,
           guests,
@@ -95,40 +153,58 @@ export default function HotelBookingPage({ params }: { params: Promise<{ id: str
           total: totalPrice,
         },
       };
-      // naive match by name
-    const lowerName = (place?.name || '').toLowerCase();
-      const updatedDays = trip.days.map(d => {
-        const match = d.location.toLowerCase();
-        if (lowerName.includes(match) || match.includes(lowerName)) {
-          const withoutOld = d.activities.filter(a => a.type !== 'Accommodation');
-          return { ...d, activities: [...withoutOld, activity] };
+
+      // 4. Update the local draft trip state
+      const dayIndex = trip.days.findIndex(d => d.location.toLowerCase() === place.location?.toLowerCase());
+      const updatedDays = [...trip.days];
+
+      if (dayIndex !== -1) {
+        const dayToUpdate = updatedDays[dayIndex];
+        const withoutOld = dayToUpdate.activities.filter(a => a.type !== 'Accommodation');
+        updatedDays[dayIndex] = { ...dayToUpdate, activities: [...withoutOld, activity] };
+      } else {
+        const firstDay = updatedDays[0];
+        if (firstDay) {
+          const withoutOld = firstDay.activities.filter(a => a.type !== 'Accommodation');
+          updatedDays[0] = { ...firstDay, activities: [...withoutOld, activity]};
         }
-        return d;
-      });
+      }
+      
       setTrip({ ...trip, days: updatedDays });
-      try {
-        localStorage.setItem('tm_accommodation_selected_location', trip.days[0]?.location || '');
-        localStorage.setItem('tm_plan_started', '1');
-        localStorage.setItem('tm_plan_step', '3');
-        document.dispatchEvent(new CustomEvent('tm:plan-started'));
-        document.dispatchEvent(new CustomEvent('tm:plan-step', { detail: { step: 3 } }));
-      } catch {}
-    } catch {}
-    setBookingConfirmed(true);
+      
+      localStorage.setItem('tm_accommodation_selected_location', trip.days[0]?.location || '');
+      localStorage.setItem('tm_plan_step', '3');
+      document.dispatchEvent(new CustomEvent('tm:plan-step', { detail: { step: 3 } }));
+
+      // 5. Show the confirmation screen
+      setBookingConfirmed(true);
+
+    } catch (e: any) {
+      console.error("Failed to save booking to database:", e);
+      alert(`There was an error saving your booking: ${e.message}`);
+    }
   };
 
-  if (!place) {
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center"><p>Loading booking information...</p></div>;
+  }
+  
+  if (error) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white border rounded-lg shadow p-6 text-center">
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">Stay not found</h1>
-          <p className="text-gray-600 mb-6">The accommodation you're trying to book doesn't exist.</p>
-          <Button onClick={() => router.push('/plan/accommodation')}>Back to Stays</Button>
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+            <div className="max-w-md w-full bg-white border rounded-lg shadow p-6 text-center">
+                <h1 className="text-xl font-semibold text-gray-900 mb-2">Error</h1>
+                <p className="text-gray-600 mb-6">{error}</p>
+                <Button onClick={() => router.back()}>Go Back</Button>
+            </div>
         </div>
-      </div>
     );
   }
 
+  if (!place) {
+    notFound();
+  }
+  
   if (bookingConfirmed) {
     return (
       <div className="min-h-screen bg-gray-100 py-12">
@@ -175,7 +251,6 @@ export default function HotelBookingPage({ params }: { params: Promise<{ id: str
           </div>
         </div>
       </div>
-
       <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col lg:flex-row gap-8">
         <div className="flex-1">
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
@@ -183,27 +258,17 @@ export default function HotelBookingPage({ params }: { params: Promise<{ id: str
               {[1, 2, 3].map((step) => (
                 <div key={step} className="flex items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                    step === currentStep ? 'bg-black text-white' :
-                    step < currentStep ? 'bg-green-600 text-white' :
-                    'bg-gray-300 text-gray-600'
-                  }`}>
+                    step === currentStep ? 'bg-black text-white' : step < currentStep ? 'bg-green-600 text-white' : 'bg-gray-300 text-gray-600'}`}>
                     {step < currentStep ? <CheckCircle className="w-5 h-5" /> : step}
                   </div>
-                  <span className={`ml-2 text-sm ${
-                    step === currentStep ? 'text-black font-semibold' :
-                    step < currentStep ? 'text-green-600' :
-                    'text-gray-500'
-                  }`}>
-                    {step === 1 && 'Personal Details'}
-                    {step === 2 && 'Payment Method'}
-                    {step === 3 && 'Confirmation'}
+                  <span className={`ml-2 text-sm ${step === currentStep ? 'text-black font-semibold' : step < currentStep ? 'text-green-600' : 'text-gray-500'}`}>
+                    {step === 1 && 'Personal Details'}{step === 2 && 'Payment Method'}{step === 3 && 'Confirmation'}
                   </span>
                   {step < 3 && <div className="flex-1 h-px bg-gray-300 mx-4" />}
                 </div>
               ))}
             </div>
           </div>
-
           <div className="bg-white rounded-lg shadow-sm border p-6">
             {currentStep === 1 && (
               <div className="space-y-6">
@@ -238,29 +303,27 @@ export default function HotelBookingPage({ params }: { params: Promise<{ id: str
                 </div>
               </div>
             )}
-
             {currentStep === 2 && (
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-gray-900">Payment Method</h2>
                 <div className="space-y-4">
-                  <div className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                  <div className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer" onClick={() => setPaymentMethod('card')}>
                     <label className="flex items-center gap-3">
-                      <input type="radio" name="paymentMethod" value="card" checked={paymentMethod === 'card'} onChange={(e) => setPaymentMethod(e.target.value as any)} className="text-blue-600" />
+                      <input type="radio" name="paymentMethod" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} className="text-blue-600 focus:ring-blue-500" />
                       <CreditCard className="w-5 h-5 text-gray-600" />
                       <div><p className="font-medium">Credit/Debit Card</p><p className="text-sm text-gray-600">Pay securely with your card</p></div>
                     </label>
                   </div>
-                  <div className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                  <div className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer" onClick={() => setPaymentMethod('cash')}>
                     <label className="flex items-center gap-3">
-                      <input type="radio" name="paymentMethod" value="cash" checked={paymentMethod === 'cash'} onChange={(e) => setPaymentMethod(e.target.value as any)} className="text-blue-600" />
+                      <input type="radio" name="paymentMethod" value="cash" checked={paymentMethod === 'cash'} onChange={() => setPaymentMethod('cash')} className="text-blue-600 focus:ring-blue-500" />
                       <div className="w-5 h-5 bg-green-600 rounded text-white flex items-center justify-center text-xs font-bold">$</div>
-                      <div><p className="font-medium">Pay at Hotel</p><p className="text-sm text-gray-600">Settle on arrival</p></div>
+                      <div><p className="font-medium">Pay at Hotel</p><p className="text-sm text-gray-600">Settle your bill upon arrival</p></div>
                     </label>
                   </div>
                 </div>
               </div>
             )}
-
             {currentStep === 3 && (
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-gray-900">Review & Confirm</h2>
@@ -278,20 +341,19 @@ export default function HotelBookingPage({ params }: { params: Promise<{ id: str
                 <div className="bg-blue-50 rounded-lg p-6">
                   <h3 className="font-semibold text-gray-900 mb-4">Price Breakdown</h3>
                   <div className="space-y-3 text-sm">
-                    <div className="flex justify-between"><span>Room rate</span><span>LKR {place.price.toLocaleString()} × {nights} nights</span></div>
+                    <div className="flex justify-between"><span>{place.price.toLocaleString()} × {nights} nights</span><span>LKR {basePrice.toLocaleString()}</span></div>
                     <div className="flex justify-between text-gray-600"><span>Service fee (10%)</span><span>LKR {serviceFee.toLocaleString()}</span></div>
                     <div className="flex justify-between text-gray-600"><span>Taxes (5%)</span><span>LKR {taxes.toLocaleString()}</span></div>
-                    <div className="border-t pt-3 flex justify-between font-semibold text-lg"><span>Total</span><span className="text-green-600">LKR {totalPrice.toLocaleString()}</span></div>
+                    <div className="border-t pt-3 flex justify-between font-semibold text-lg"><span>Total Amount</span><span className="text-green-600">LKR {totalPrice.toLocaleString()}</span></div>
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <label className="flex items-start gap-3"><input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="mt-1 text-blue-600" /><span className="text-sm text-gray-700">I agree to the <a href="#" className="text-blue-600 hover:underline">Terms and Conditions</a></span></label>
-                  <label className="flex items-start gap-3"><input type="checkbox" checked={agreedToPolicy} onChange={(e) => setAgreedToPolicy(e.target.checked)} className="mt-1 text-blue-600" /><span className="text-sm text-gray-700">I agree to the <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a></span></label>
+                  <label className="flex items-start gap-3"><input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="mt-1 text-blue-600 focus:ring-blue-500" /><span className="text-sm text-gray-700">I agree to the <a href="#" className="text-blue-600 hover:underline">Terms and Conditions</a></span></label>
+                  <label className="flex items-start gap-3"><input type="checkbox" checked={agreedToPolicy} onChange={(e) => setAgreedToPolicy(e.target.checked)} className="mt-1 text-blue-600 focus:ring-blue-500" /><span className="text-sm text-gray-700">I agree to the <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a></span></label>
                 </div>
               </div>
             )}
-
-            <div className="flex justify-between pt-8 border-t">
+            <div className="flex justify-between pt-8 border-t mt-6">
               <Button onClick={() => setCurrentStep(s => Math.max(1, s - 1))} disabled={currentStep === 1} variant="outline">Previous</Button>
               {currentStep < 3 ? (
                 <Button onClick={() => setCurrentStep(s => Math.min(3, s + 1))} disabled={!isStepValid()} size="lg">Continue</Button>
@@ -301,14 +363,15 @@ export default function HotelBookingPage({ params }: { params: Promise<{ id: str
             </div>
           </div>
         </div>
-
         <div className="w-full lg:w-96 space-y-6">
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            {/* Image */}
+          <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-28">
             <img src={place.images?.[0] || '/hero/hero-1.jpg'} alt={place.name} className="w-full h-48 object-cover rounded-lg mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">{place.name}</h3>
             <p className="text-gray-600 mb-4">{place.type}</p>
-            <div className="flex items-center gap-4 text-sm text-gray-600 mb-4"><span className="flex items-center gap-1"><Users className="w-4 h-4" />{guests} guests</span><span><Star className="w-4 h-4 text-yellow-400 fill-yellow-400" /> {place.rating}</span></div>
+            <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+              <span className="flex items-center gap-1"><Users className="w-4 h-4" />{guests} guests</span>
+              <span><Star className="w-4 h-4 text-yellow-400 fill-yellow-400" /> {place.rating}</span>
+            </div>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between"><span>Room rate</span><span>LKR {place.price.toLocaleString()}</span></div>
               <div className="flex justify-between"><span>Nights</span><span>{nights}</span></div>

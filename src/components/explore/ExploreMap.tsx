@@ -1,6 +1,7 @@
 "use client";
 
-import React from 'react';
+// --- FIX: Add useMemo to the React import ---
+import React, { useMemo } from 'react'; 
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Place } from '@/lib/mock-data';
@@ -14,15 +15,8 @@ type ExploreMapProps = {
   category: 'stay' | 'activity' | 'eat' | 'flight' | 'sights' | 'atm';
 };
 
-const createPinIcon = (isHovered: boolean) => {
-    const pinSVG = `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="fill:#0f172a; stroke:white; stroke-width:1.5;"><path d="M16,1C9.9,1,5,5.9,5,12c0,8,11,18,11,18s11-10,11-18C27,5.9,22.1,1,16,1z M16,17c-2.8,0-5-2.2-5-5s2.2-5,5-5s5,2.2,5,5S18.8,17,16,17z"/></svg>`;
-    const scale = isHovered ? 'scale(1.2)' : 'scale(1)';
-    const markerHtml = `<div style="transform: ${scale}; transition: transform 0.2s ease-in-out; transform-origin: bottom;">${pinSVG}</div>`;
-    return divIcon({ html: markerHtml, className: 'custom-leaflet-icon', iconSize: [32, 32], iconAnchor: [16, 32] });
-};
-
 const createPriceIcon = (place: Place, isHovered: boolean) => {
-    const priceFormatted = `LKR ${(place.price / 1000).toFixed(0)}k`;
+    const priceFormatted = `LKR ${place.price ? (place.price / 1000).toFixed(0) + 'k' : 'N/A'}`;
     const baseClasses = "transition-all duration-200";
     const hoveredClasses = "bg-slate-900 text-white scale-110 z-20";
     const defaultClasses = "bg-white text-slate-900";
@@ -30,12 +24,19 @@ const createPriceIcon = (place: Place, isHovered: boolean) => {
     return divIcon({ html: markerHtml, className: 'custom-leaflet-icon', iconSize: [80, 45], iconAnchor: [40, 45] });
 };
 
+const createPinIcon = (isHovered: boolean) => {
+    const pinSVG = `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="fill:#0f172a; stroke:white; stroke-width:1.5;"><path d="M16,1C9.9,1,5,5.9,5,12c0,8,11,18,11,18s11-10,11-18C27,5.9,22.1,1,16,1z M16,17c-2.8,0-5-2.2-5-5s2.2-5,5-5s5,2.2,5,5S18.8,17,16,17z"/></svg>`;
+    const scale = isHovered ? 'scale(1.2)' : 'scale(1)';
+    const markerHtml = `<div style="transform: ${scale}; transition: transform 0.2s ease-in-out; transform-origin: bottom;">${pinSVG}</div>`;
+    return divIcon({ html: markerHtml, className: 'custom-leaflet-icon', iconSize: [32, 32], iconAnchor: [16, 32] });
+};
+
 const MapEvents = ({ hoveredPlaceId, places, setCardPosition, setCardPlace }: any) => {
     const map = useMap();
     React.useEffect(() => {
         if (hoveredPlaceId) {
             const place = places.find((p: Place) => p.id === hoveredPlaceId);
-            if (place) {
+            if (place && typeof place.latitude === 'number' && typeof place.longitude === 'number') {
                 const point = map.latLngToContainerPoint([place.latitude, place.longitude]);
                 setCardPosition(point);
                 setCardPlace(place);
@@ -48,15 +49,21 @@ const MapEvents = ({ hoveredPlaceId, places, setCardPosition, setCardPlace }: an
 }
 
 export const ExploreMap = ({ places, hoveredPlaceId, onMarkerHover, category }: ExploreMapProps) => {
-  const [cardPosition, setCardPosition] = React.useState(null);
+  const [cardPosition, setCardPosition] = React.useState<{x: number, y: number} | null>(null);
   const [cardPlace, setCardPlace] = React.useState<Place | null>(null);
+
+  const placesWithCoords = useMemo(() => 
+    // --- FIX: Add the 'Place' type annotation to the 'place' parameter ---
+    places.filter((place: Place) => typeof place.latitude === 'number' && typeof place.longitude === 'number'),
+    [places]
+  );
 
   return (
     <div className="h-full w-full relative">
       <MapContainer center={[7.8731, 80.7718]} zoom={8} style={{ width: '100%', height: '100%' }} scrollWheelZoom={true} className="z-0">
         <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <MapEvents hoveredPlaceId={hoveredPlaceId} places={places} setCardPosition={setCardPosition} setCardPlace={setCardPlace} />
-        {places.map(place => (
+        <MapEvents hoveredPlaceId={hoveredPlaceId} places={placesWithCoords} setCardPosition={setCardPosition} setCardPlace={setCardPlace} />
+        {placesWithCoords.map(place => (
           <Marker
             key={place.id}
             position={[place.latitude, place.longitude]}
