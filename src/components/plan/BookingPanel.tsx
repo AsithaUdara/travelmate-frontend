@@ -19,14 +19,24 @@ export const BookingPanel = ({ place }: { place: Place }) => {
     const [guests, setGuests] = useState(2);
     const [isConfirming, setIsConfirming] = useState(false);
 
+    // --- FIX: Add a guard clause for safety ---
+    if (!place) {
+        return (
+            <div className="sticky top-28 border rounded-xl shadow-lg p-6 text-center">
+                <p>Loading booking details...</p>
+            </div>
+        );
+    }
+    // ------------------------------------------
+
     const numberOfNights = useMemo(() => {
         if (checkIn && checkOut) {
-            return differenceInDays(checkOut, checkIn);
+            return Math.max(0, differenceInDays(checkOut, checkIn));
         }
         return 0;
     }, [checkIn, checkOut]);
 
-    const basePrice = place.price * numberOfNights;
+    const basePrice = (place.price || 0) * numberOfNights; // Use default of 0 if price is missing
     const serviceFee = Math.round(basePrice * 0.1);
     const taxes = Math.round(basePrice * 0.05);
     const totalPrice = basePrice + serviceFee + taxes;
@@ -40,7 +50,6 @@ export const BookingPanel = ({ place }: { place: Place }) => {
     };
     
     const handleProceedToPayment = () => {
-        // Navigate to the multi-step booking flow, carrying the selected dates and guests
         if (!checkIn || !checkOut || numberOfNights <= 0) return;
         const qs = new URLSearchParams({
             checkIn: format(checkIn, 'yyyy-MM-dd'),
@@ -48,33 +57,6 @@ export const BookingPanel = ({ place }: { place: Place }) => {
             guests: String(guests),
         }).toString();
         router.push(`/plan/hotel/${place.id}/booking?${qs}`);
-    };
-
-    const inferLocationFromPlace = (hotelName: string) => {
-        const lower = hotelName.toLowerCase();
-        // naive mapping to match trip day locations
-        if (lower.includes('colombo')) return 'colombo';
-        if (lower.includes('kandy')) return 'kandy';
-        if (lower.includes('ella')) return 'ella';
-        if (lower.includes('mirissa')) return 'mirissa';
-        if (lower.includes('galle')) return 'galle';
-        return '';
-    };
-
-    const findBestDayIndex = () => {
-        // Fall back to nearest itinerary day based on coordinates when name mapping fails
-        let bestIdx = 0;
-        let best = Number.POSITIVE_INFINITY;
-        trip.days.forEach((d, i) => {
-            const dx = (d.latitude || 0) - (place.latitude || 0);
-            const dy = (d.longitude || 0) - (place.longitude || 0);
-            const dist = dx * dx + dy * dy;
-            if (dist < best) {
-                best = dist;
-                bestIdx = i;
-            }
-        });
-        return bestIdx;
     };
 
     return (

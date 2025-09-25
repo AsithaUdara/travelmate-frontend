@@ -4,6 +4,8 @@ const path = require('path');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const admin = require('firebase-admin');
+const accommodationRoutes = require('./routes/accommodationRoutes');
+const accBookingRoutes = require('./routes/accBookingRoutes');
 
 // Load env vars from .env file explicitly from backend directory
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -57,11 +59,12 @@ if (process.env.NODE_ENV !== 'production') {
 // This line tells the server that any request starting with "/api/auth"
 // should be handled by the routes defined in './routes/authRoutes.js'
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/accommodations', accommodationRoutes);
 
 // You will add more routes here as your application grows
 // Example: app.use('/api/trips', require('./routes/tripRoutes'));
 // --------------------
-
+app.use('/api/bookings', accBookingRoutes);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
