@@ -30,10 +30,10 @@ const getTitle = (category: string) => {
 export const ResultsPane = ({ places, onPlaceHover, hoveredPlaceId, category }: ResultsPaneProps) => {
   // Curated Eats list
   const curatedEats: Place[] = category === 'eat' ? [
-    { id: 'eat-col-1', name: 'Nuga Gama - Cinnamon Grand', category: 'eat', type: 'Sri Lankan Restaurant', images: ['/gallery/gallery-2.jpg'], rating: 4.7, reviews: 2100, price: 8000, totalPrice: 8000, priceType: 'person', latitude: 6.9159, longitude: 79.8487 },
+    { id: 'eat-col-1', name: 'Nuga Gama - Cinnamon Grand', category: 'eat', type: 'Sri Lankan Restaurant', images: ['/gallery/image1.png'], rating: 4.7, reviews: 2100, price: 8000, totalPrice: 8000, priceType: 'person', latitude: 6.9159, longitude: 79.8487 },
     { id: 'eat-kdy-1', name: 'The Empire Cafe', category: 'eat', type: 'Cafe & Sri Lankan', images: ['/gallery/gallery-3.jpg'], rating: 4.6, reviews: 1250, price: 4500, totalPrice: 4500, priceType: 'person', latitude: 7.2906, longitude: 80.6337 },
-    { id: 'eat-ell-1', name: 'Cafe Chill', category: 'eat', type: 'Casual Dining', images: ['/gallery/gallery-4.jpg'], rating: 4.5, reviews: 1890, price: 3500, totalPrice: 3500, priceType: 'person', latitude: 6.8667, longitude: 81.0466 },
-    { id: 'eat-gal-1', name: 'Pedlar’s Inn Cafe', category: 'eat', type: 'Cafe & Western', images: ['/gallery/gallery-1.jpg'], rating: 4.4, reviews: 980, price: 4200, totalPrice: 4200, priceType: 'person', latitude: 6.0535, longitude: 80.2210 },
+    { id: 'eat-ell-1', name: 'Cafe Chill', category: 'eat', type: 'Casual Dining', images: ['/gallery/image2.png'], rating: 4.5, reviews: 1890, price: 3500, totalPrice: 3500, priceType: 'person', latitude: 6.8667, longitude: 81.0466 },
+    { id: 'eat-gal-1', name: 'Pedlar’s Inn Cafe', category: 'eat', type: 'Cafe & Western', images: ['/gallery/image.png'], rating: 4.4, reviews: 980, price: 4200, totalPrice: 4200, priceType: 'person', latitude: 6.0535, longitude: 80.2210 },
   ] : [];
   const finalPlaces = category === 'eat' ? [...curatedEats, ...places] : places;
   return (

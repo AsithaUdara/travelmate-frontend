@@ -7,44 +7,142 @@ export type Place = {
   rating: number;
   reviews: number;
   price: number;
-  totalPrice: number;
+  totalPrice?: number;
   priceType: 'night' | 'person' | 'total';
-  latitude: number;
-  longitude: number;
-  location?: string; 
-  description?: string; // Add description, make it optional
-  amenities?: {        // Add amenities, make it optional
+  latitude?: number;
+  longitude?: number;
+  location?: string;
+  description?: string;
+  amenities?: {
     wifi?: boolean;
     pool?: boolean;
   };
 };
 
-
 export const mockPlaces: Place[] = [
-  // Stays (local images)
-  // { id: 'stay1', name: 'Galle Face Hotel', category: 'stay', type: '5-Star Hotel', images: ['/gallery/gallery-1.jpg', '/hero/hero-1.jpg', '/hero/hero-2.jpg'], rating: 4.7, reviews: 6201, price: 125000, totalPrice: 2375000, priceType: 'night', latitude: 6.9214, longitude: 79.8447 },
-  // { id: 'stay2', name: 'Heritance Kandalama', category: 'stay', type: '5-Star Eco Hotel', images: ['/gallery/gallery-2.jpg', '/hero/hero-3.jpg'], rating: 4.9, reviews: 4812, price: 142000, totalPrice: 2698000, priceType: 'night', latitude: 7.8543, longitude: 80.7000 },
-  // { id: 'stay3', name: '98 Acres Resort & Spa', category: 'stay', type: 'Resort', images: ['/gallery/gallery-3.jpg', '/hero/hero-4.jpg'], rating: 4.8, reviews: 3150, price: 98000, totalPrice: 1862000, priceType: 'night', latitude: 6.9934, longitude: 81.0550 },
-  // { id: 'stay4', name: 'Jetwing Vil Uyana', category: 'stay', type: 'Luxury Villa Resort', images: ['/gallery/gallery-4.jpg', '/hero/hero-5.jpg'], rating: 4.9, reviews: 2980, price: 180000, totalPrice: 3420000, priceType: 'night', latitude: 7.9575, longitude: 80.7600 },
-  // { id: 'stay5', name: 'Cinnamon Grand Colombo', category: 'stay', type: 'City Hotel', images: ['/gallery/cta-bg.jpg', '/hero/hero-6.jpg'], rating: 4.6, reviews: 7800, price: 110000, totalPrice: 2090000, priceType: 'night', latitude: 6.9159, longitude: 79.8487 },
-  // { id: 'stay6', name: 'The Fortress Resort & Spa', category: 'stay', type: 'Boutique Resort', images: ['/gallery/cta-bg2.jpg', '/hero/hero-2.jpg'], rating: 4.8, reviews: 2400, price: 165000, totalPrice: 3135000, priceType: 'night', latitude: 5.948, longitude: 80.464 },
+  // --- Sights & Activities Near Kandy ---
+  { 
+    id: 'act1', 
+    name: 'Sigiriya Rock Fortress Climb', 
+    category: 'activity', 
+    type: 'Historic Site', 
+    images: [
+      'https://tse1.mm.bing.net/th/id/OIP.hfcbZptS11K6OXH-rhOxdgHaE7?rs=1&pid=ImgDetMain&o=7&rm=3',
+      'https://www.storiesbysoumya.com/wp-content/uploads/2021/11/sigiriya-rock-fortress.jpg',
+      'https://picsum.photos/id/1018/800/600'
+    ], 
+    rating: 4.9, 
+    reviews: 12040, 
+    price: 10000, 
+    totalPrice: 10000, 
+    priceType: 'person', 
+    latitude: 7.9575, 
+    longitude: 80.7600 
+  },
+  { 
+    id: 'sight3', 
+    name: 'Dambulla Cave Temple', 
+    category: 'sights', 
+    type: 'Ancient Temple Complex', 
+    images: [
+      'https://tse2.mm.bing.net/th/id/OIP.gr5FAs9w-OC3vmKXOvhW7QHaFj?rs=1&pid=ImgDetMain&o=7&rm=3',
+      'https://tse1.mm.bing.net/th/id/OIP.qP-oo_H_m82skTXhTmekQwHaFG?rs=1&pid=ImgDetMain&o=7&rm=3'
+    ], 
+    rating: 4.7, 
+    reviews: 9800, 
+    price: 1500, 
+    totalPrice: 1500, 
+    priceType: 'person', 
+    latitude: 7.856, 
+    longitude: 80.648 
+  },
+  { 
+    id: 'act2', 
+    name: 'Pinnawala Elephant Orphanage', 
+    category: 'activity', 
+    type: 'Nature & Wildlife',
+    images: [
+      'https://i.pinimg.com/originals/ed/2f/3b/ed2f3ba76fa07de533a0591f7501fbb4.jpg', 
+      'https://cdn.shopify.com/s/files/1/0396/9165/files/elephant-in-river.jpg?v=1504886679'
+    ],
+    rating: 4.4, 
+    reviews: 7500, 
+    price: 3000, 
+    totalPrice: 3000, 
+    priceType: 'person', 
+    latitude: 7.295, 
+    longitude: 80.385 
+  },
+  { 
+    id: 'act3', 
+    name: 'Knuckles Mountain Range Trek', 
+    category: 'activity', 
+    type: 'Hiking & Nature', 
+    images: [
+      'https://tse2.mm.bing.net/th/id/OIP.IZfW73S7CPwVKSmyEf01DAHaEh?rs=1&pid=ImgDetMain&o=7&rm=3',
+      // --- TYPO FIXED HERE ---
+      'https://tse2.mm.bing.net/th/id/OIP.6zDzw1fu2MRW4nVJqqTrpAHaFj?w=550&h=413&rs=1&pid=ImgDetMain&o=7&rm=3'
+    ], 
+    rating: 4.9, 
+    reviews: 1800, 
+    price: 5000, 
+    totalPrice: 5000, 
+    priceType: 'person', 
+    latitude: 7.450, 
+    longitude: 80.800 
+  },
+  { 
+    id: 'sight2', 
+    name: 'Nuwara Eliya Tea Plantations', 
+    category: 'sights', 
+    type: 'Scenic Landmark', 
+    images: [
+      'https://th.bing.com/th/id/R.6d2725d2a14b9ee63b02a9b80d6f6b6a?rik=kqGAH1k2ISdaLA&pid=ImgRaw&r=0', 
+      // --- TYPO FIXED HERE ---
+      'https://media.tacdn.com/media/attractions-splice-spp-674x446/06/70/5b/e8.jpg'
+    ], 
+    rating: 4.8, 
+    reviews: 11200, 
+    price: 0, 
+    totalPrice: 0, 
+    priceType: 'total', 
+    latitude: 6.949, 
+    longitude: 80.789 
+  },
 
-  // // Activities (local images reused)
-  // { id: 'act1', name: 'Sigiriya Rock Fortress Climb', category: 'activity', type: 'Historic Site', images: ['/hero/hero-3.jpg', '/gallery/gallery-1.jpg'], rating: 4.9, reviews: 12040, price: 10000, totalPrice: 10000, priceType: 'person', latitude: 7.9575, longitude: 80.7600 },
-  // { id: 'act2', name: 'Yala National Park Safari', category: 'activity', type: 'Nature & Wildlife Tour', images: ['/hero/hero-4.jpg', '/gallery/gallery-2.jpg'], rating: 4.7, reviews: 8890, price: 15000, totalPrice: 15000, priceType: 'person', latitude: 6.3667, longitude: 81.4667 },
-  // { id: 'act3', name: 'Whale Watching in Mirissa', category: 'activity', type: 'Boat Tour', images: ['/hero/hero-5.jpg', '/gallery/gallery-3.jpg'], rating: 4.6, reviews: 5600, price: 12000, totalPrice: 12000, priceType: 'person', latitude: 5.9482, longitude: 80.4548 },
-  // { id: 'act4', name: 'Kandy to Ella Train Journey', category: 'activity', type: 'Scenic Transport', images: ['/hero/hero-6.jpg', '/gallery/gallery-4.jpg'], rating: 4.9, reviews: 22500, price: 3000, totalPrice: 3000, priceType: 'person', latitude: 6.9934, longitude: 81.0550 },
-
-  // // Eats (local images)
-  // { id: 'eat1', name: 'Ministry of Crab', category: 'eat', type: 'Seafood Restaurant', images: ['/gallery/gallery-2.jpg'], rating: 4.8, reviews: 2500, price: 20000, totalPrice: 20000, priceType: 'person', latitude: 6.935, longitude: 79.848 },
-  // { id: 'eat2', name: 'The Gallery Cafe', category: 'eat', type: 'Cafe & Restaurant', images: ['/gallery/gallery-3.jpg'], rating: 4.6, reviews: 1800, price: 8000, totalPrice: 8000, priceType: 'person', latitude: 6.9036, longitude: 79.8591 },
-  
-  // // Sights (local images)
-  // { id: 'sight1', name: 'Galle Fort', category: 'sights', type: 'UNESCO World Heritage Site', images: ['/gallery/gallery-1.jpg'], rating: 4.8, reviews: 15200, price: 0, totalPrice: 0, priceType: 'person', latitude: 6.027, longitude: 80.217 },
-  // { id: 'sight2', name: 'Nine Arch Bridge', category: 'sights', type: 'Iconic Landmark', images: ['/gallery/gallery-4.jpg'], rating: 4.9, reviews: 18500, price: 0, totalPrice: 0, priceType: 'person', latitude: 6.876, longitude: 81.047 },
-  // { id: 'sight3', name: 'Dambulla Cave Temple', category: 'sights', type: 'Ancient Temple Complex', images: ['/gallery/gallery-2.jpg'], rating: 4.7, reviews: 9800, price: 1500, totalPrice: 1500, priceType: 'person', latitude: 7.856, longitude: 80.648 },
-
-  // // ATMs (local images)
-  // { id: 'atm1', name: 'Commercial Bank ATM', category: 'atm', type: 'Bank ATM', images: ['/gallery/gallery-3.jpg'], rating: 4.2, reviews: 150, price: 0, totalPrice: 0, priceType: 'total', latitude: 6.9344, longitude: 79.8459 },
-  // { id: 'atm2', name: 'HSBC ATM', category: 'atm', type: 'Bank ATM', images: ['/gallery/gallery-1.jpg'], rating: 4.0, reviews: 90, price: 0, totalPrice: 0, priceType: 'total', latitude: 6.911, longitude: 79.851 },
+  // --- Stays Near Kandy ---
+  { 
+    id: 'stay2', 
+    name: 'Heritance Kandalama', 
+    category: 'stay', 
+    type: '5-Star Eco Hotel', 
+    images: [
+      'https://th.bing.com/th/id/R.a3166eac313cfeb3ca07c2c5b1567e02?rik=ZudZgr4gA1%2fFhw&pid=ImgRaw&r=0', 
+      'https://media.vamonos.nl/original/original/Heritance-Kandalama-3.jpg'
+    ], 
+    rating: 4.9, 
+    reviews: 4812, 
+    price: 142000, 
+    totalPrice: 2698000, 
+    priceType: 'night', 
+    latitude: 7.8543, 
+    longitude: 80.7000 
+  },
+  { 
+    id: 'stay3', 
+    name: 'Amaya Hills Kandy', 
+    category: 'stay', 
+    type: 'Luxury Hotel', 
+    images: [
+      'https://dev2.uplist.lk/wp-content/uploads/2022/08/amaya-hills-aerial-view-1.jpg', 
+      'https://sysadmin.niwadu.com/storage/uploads/images/YS3Tbd97RhObKKHPXncLHpY34cyfWBi7OlTWEpEr.jpg'
+    ], 
+    rating: 4.6, 
+    reviews: 3200, 
+    price: 85000, 
+    totalPrice: 1615000, 
+    priceType: 'night', 
+    latitude: 7.275, 
+    longitude: 80.600 
+  },
 ];
