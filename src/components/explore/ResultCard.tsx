@@ -4,6 +4,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Image from 'next/image';
 import { StarIcon } from '@heroicons/react/24/solid';
 import { cn } from '@/lib/utils';
+import { DEFAULT_HOTEL_IMAGES } from '@/config/images';
 
 type ResultCardProps = {
   place: Place;
@@ -13,6 +14,12 @@ type ResultCardProps = {
 };
 
 export const ResultCard = ({ place, onHover, isHovered, isRecommended = false }: ResultCardProps) => {
+  // For hotels/stays, ALWAYS use our default image regardless of provided images
+  // For other categories, fallback to default when images are missing
+  const images = place.category === 'stay'
+    ? DEFAULT_HOTEL_IMAGES
+    : ((place.images && place.images.length > 0) ? place.images : DEFAULT_HOTEL_IMAGES);
+
   return (
     <div 
       className={cn(
@@ -26,7 +33,7 @@ export const ResultCard = ({ place, onHover, isHovered, isRecommended = false }:
       <div className="w-1/3 flex-shrink-0">
         <Carousel className="w-full h-full group">
           <CarouselContent className="h-full">
-            {place.images.map((img, index) => (
+            {images.map((img, index) => (
               <CarouselItem key={index} className="relative">
     <Image src={img} alt={place.name} fill style={{objectFit: 'cover'}} className={cn(isRecommended ? "" : "rounded-l-xl")} />
               </CarouselItem>

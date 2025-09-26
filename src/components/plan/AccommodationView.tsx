@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { Trip, Activity } from '@/lib/trip-data';
 import { AccommodationSidebar } from './AccommodationSidebar';
 import { AccommodationSelectionPanel } from './AccommodationSelectionPanel';
-import { HotelDetailModal } from './HotelDetailModal';
 import { Place } from '@/lib/mock-data';
 
 type AccommodationViewProps = {
@@ -93,13 +92,14 @@ export const AccommodationView = ({ trip, setTrip }: AccommodationViewProps) => 
         <div className="flex-1 min-h-0">
           <AccommodationSelectionPanel 
             locationName={selectedLocation}
+            interests={trip.interests || []}
           />
         </div>
       )}
     </div>
       </motion.div>
       
-  {/* HotelDetailModal is now replaced by a dedicated page. Keep this block removed. */}
+  {/* HotelDetailModal is now replaced by a dedicated page. */}
     </>
   );
 };

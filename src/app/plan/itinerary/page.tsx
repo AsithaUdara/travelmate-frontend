@@ -1,23 +1,39 @@
 "use client";
 
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ItineraryView } from '@/components/plan/ItineraryView';
+import { Trip } from '@/lib/trip-data';
+import { saveDraftTrip, loadDraftTrip } from '@/lib/draft-trip';
 import { PlanActions } from '@/components/plan/PlanActions';
-import { useDraftTrip } from '@/lib/draft-trip';
 
-export default function PlanItineraryPage() {
+function ItineraryPageContent() {
   const router = useRouter();
-  const [trip, setTrip] = useDraftTrip();
+  const searchParams = useSearchParams();
+  const [trip, setTrip] = useState<Trip | null>(null);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('tm_plan_started', '1');
-  localStorage.setItem('tm_plan_step', '1');
-      document.dispatchEvent(new CustomEvent('tm:plan-started'));
-  document.dispatchEvent(new CustomEvent('tm:plan-step', { detail: { step: 1 } }));
-    } catch {}
-  }, []);
+    const tripParam = searchParams.get('trip');
+    if (tripParam) {
+      try {
+        const decoded = JSON.parse(atob(tripParam));
+        setTrip(decoded);
+        try { saveDraftTrip(decoded); } catch {}
+      } catch (e) {
+        console.error('Failed to parse trip data from URL:', e);
+      }
+    } else {
+      // Fallback: load last draft so the page isn't stuck
+      try {
+        const draft = loadDraftTrip();
+        setTrip(draft);
+      } catch {}
+    }
+  }, [searchParams]);
+
+  if (!trip) {
+    return <div className="flex-1 bg-slate-100 flex items-center justify-center">Generating your itinerary...</div>;
+  }
 
   return (
     <div className="h-full flex flex-col">
@@ -33,5 +49,13 @@ export default function PlanItineraryPage() {
         onSkip={() => router.push('/plan/transport')}
       />
     </div>
+  );
+}
+
+export default function PlanItineraryPage() {
+  return (
+    <Suspense fallback={<div className="flex-1 bg-slate-100 flex items-center justify-center">Loading Planner...</div>}>
+      <ItineraryPageContent />
+    </Suspense>
   );
 }

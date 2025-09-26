@@ -42,10 +42,15 @@ export const BookingPanel = ({ place }: { place: Place }) => {
     const handleProceedToPayment = () => {
         // Navigate to the multi-step booking flow, carrying the selected dates and guests
         if (!checkIn || !checkOut || numberOfNights <= 0) return;
+        let placeB64 = '';
+        try {
+            placeB64 = typeof window !== 'undefined' ? btoa(JSON.stringify(place)) : '';
+        } catch {}
         const qs = new URLSearchParams({
             checkIn: format(checkIn, 'yyyy-MM-dd'),
             checkOut: format(checkOut, 'yyyy-MM-dd'),
             guests: String(guests),
+            ...(placeB64 ? { place: placeB64 } : {}),
         }).toString();
         router.push(`/plan/hotel/${place.id}/booking?${qs}`);
     };

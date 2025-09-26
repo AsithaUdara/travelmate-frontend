@@ -1,21 +1,34 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { notFound } from "next/navigation";
-import { mockPlaces } from "@/lib/mock-data";
+import { useRouter, useSearchParams, useParams, notFound } from "next/navigation";
+import { mockPlaces, Place } from "@/lib/mock-data";
 import { useDraftTrip } from "@/lib/draft-trip";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowLeft, CreditCard, Info, Star, Users, Calendar as CalIcon } from "lucide-react";
 
-export default function HotelBookingPage({ params }: { params: Promise<{ id: string }> }) {
+export default function HotelBookingPage() {
   const router = useRouter();
-  const { id } = React.use(params);
+  const { id } = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const [trip, setTrip] = useDraftTrip();
 
-  const place = useMemo(() => mockPlaces.find(p => p.id === id && p.category === 'stay'), [id]);
+  const place: Place | undefined = useMemo(() => {
+    // Prefer the full place object passed via base64 in query
+    const qp = searchParams.get('place');
+    if (qp) {
+      try {
+        const json = typeof window !== 'undefined' ? atob(qp) : '';
+        if (json) {
+          const parsed = JSON.parse(json) as Place;
+          return parsed;
+        }
+      } catch {}
+    }
+    // Fallback to mockPlaces by id
+    return mockPlaces.find(p => p.id === id && p.category === 'stay');
+  }, [id, searchParams]);
 
   // Prefill from query
   const qCheckIn = searchParams.get('checkIn');
@@ -119,7 +132,7 @@ export default function HotelBookingPage({ params }: { params: Promise<{ id: str
 
   if (!place) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+      <div className="h-full min-h-0 overflow-y-auto bg-gray-100 flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-white border rounded-lg shadow p-6 text-center">
           <h1 className="text-xl font-semibold text-gray-900 mb-2">Stay not found</h1>
           <p className="text-gray-600 mb-6">The accommodation you're trying to book doesn't exist.</p>
@@ -131,7 +144,7 @@ export default function HotelBookingPage({ params }: { params: Promise<{ id: str
 
   if (bookingConfirmed) {
     return (
-      <div className="min-h-screen bg-gray-100 py-12">
+      <div className="h-full min-h-0 overflow-y-auto bg-gray-100 py-12">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-lg border p-8 text-center relative">
             <div className="absolute top-4 right-4 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">Redirecting in {countdown}s</div>
@@ -163,7 +176,7 @@ export default function HotelBookingPage({ params }: { params: Promise<{ id: str
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="h-full min-h-0 overflow-y-auto bg-gray-100">
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">

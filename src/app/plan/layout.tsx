@@ -12,7 +12,7 @@ export default function PlanLayout({
       <div className="flex flex-1 overflow-hidden">
         <PlanVerticalNav />
         {/* The main content area where the page will be rendered */}
-        <main className="flex-1 bg-slate-50 overflow-y-auto">
+        <main className="flex-1 bg-slate-50 overflow-hidden">
           {children}
         </main>
       </div>

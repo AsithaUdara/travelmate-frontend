@@ -6,11 +6,19 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    // Allow remote images from Unsplash used on the landing page
+    // Allow remote images we use across the app
     remotePatterns: [
+      // Unsplash CDN (direct image assets)
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      // Pexels CDN
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+        pathname: "/**",
       },
     ],
   },

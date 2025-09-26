@@ -6,12 +6,15 @@ import { AccommodationView } from '@/components/plan/AccommodationView';
 import { PlanActions } from '@/components/plan/PlanActions';
 import { useDraftTrip } from '@/lib/draft-trip';
 import { SaveTripModal } from '@/components/plan/SaveTripModal';
-import { saveTrip } from '@/lib/trip-manager';
+import { saveTrip } from '@/services/trips';
+import { toast } from 'sonner';
 
 export default function PlanAccommodationPage() {
   const router = useRouter();
   const [trip, setTrip] = useDraftTrip();
   const [isSaveOpen, setIsSaveOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     try {
@@ -22,11 +25,25 @@ export default function PlanAccommodationPage() {
     } catch {}
   }, []);
 
-  const handleSave = (newName: string) => {
-    saveTrip({ ...trip, name: newName });
-    setIsSaveOpen(false);
-    router.push('/my-trips');
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleSave = async (newName: string, coverImage?: string) => {
+    setSaving(true);
+    try {
+      const savedTrip = await saveTrip({ ...trip, name: newName }, coverImage);
+      toast.success('Trip saved successfully!');
+      setIsSaveOpen(false);
+      router.push('/my-trips');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to save trip');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (!mounted) return null;
 
   return (
     <div className="h-full flex flex-col">

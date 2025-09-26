@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { mockPlaces, Place } from '@/lib/mock-data';
+import type { Place } from '@/lib/mock-data';
+import { mockPlaces } from '@/lib/mock-data';
 import { ResultCard } from '../explore/ResultCard';
 import { FilterSheet } from './FilterSheet';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,8 @@ import { ArrowsUpDownIcon, SparklesIcon, CheckIcon } from '@heroicons/react/24/s
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { getAIAccommodationSuggestions } from '@/services/ai';
+import { DEFAULT_HOTEL_IMAGE } from '@/config/images';
 
 const ExploreMap = dynamic(() =>
   import('@/components/explore/ExploreMap').then(mod => mod.ExploreMap),
@@ -17,11 +20,16 @@ const ExploreMap = dynamic(() =>
 
 type AccommodationSelectionPanelProps = {
   locationName: string;
+  interests?: string[];
 };
 
-export const AccommodationSelectionPanel = ({ locationName }: AccommodationSelectionPanelProps) => {
+export const AccommodationSelectionPanel = ({ locationName, interests = [] }: AccommodationSelectionPanelProps) => {
   const [hoveredPlaceId, setHoveredPlaceId] = useState<string | null>(null);
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [fromCache, setFromCache] = useState(false);
+  const [places, setPlaces] = useState<(Place & { isRecommended?: boolean })[]>([]);
 
   // Filter state (editable)
   const [priceRange, setPriceRange] = useState<[number, number]>([10000, 200000]);
@@ -65,22 +73,64 @@ export const AccommodationSelectionPanel = ({ locationName }: AccommodationSelec
     setAppliedFilters({ ...defaults, minRating: 0, amenities: { wifi: false, pool: false } });
   };
 
-  // Filtered list based on applied filters and location match
+  // Fetch AI accommodation suggestions when locationName or interests change
+  useEffect(() => {
+    let ignore = false;
+    async function load() {
+      if (!locationName) return;
+      setLoading(true); setError(null);
+      try {
+        const { data, fromCache: fc } = await getAIAccommodationSuggestions(locationName, interests || []);
+        if (ignore) return;
+        // Enforce default image for all stays regardless of provided images
+        const normalized = (data || []).map(p => ({
+          ...p,
+          images: [DEFAULT_HOTEL_IMAGE],
+        }));
+        setPlaces(normalized);
+        setFromCache(fc);
+      } catch (e: any) {
+        if (ignore) return;
+        // Fallback to local mock data so the UI is still usable in dev/offline
+        setError(e?.message || 'Failed to load accommodation suggestions');
+        const nameLower = locationName.toLowerCase();
+        const local = mockPlaces.filter(p => p.category === 'stay' && (
+          p.name.toLowerCase().includes(nameLower) || p.type.toLowerCase().includes(nameLower)
+        ));
+        const useLocal = local.length ? local : mockPlaces.filter(p => p.category === 'stay');
+        // Mark highest-rated as recommended
+        const sorted = [...useLocal].sort((a, b) => b.rating - a.rating || b.reviews - a.reviews);
+        const withRec = sorted.map((p, i) => ({
+          ...p,
+          images: [DEFAULT_HOTEL_IMAGE],
+          isRecommended: i === 0,
+        }));
+        setPlaces(withRec);
+        setFromCache(true);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+    load();
+    return () => { ignore = true; };
+  }, [locationName, interests]);
+
+  // Apply client-side filters on AI results
   const filteredStays = useMemo(() => {
-    const base = mockPlaces.filter(place => 
+    const base = (places || []).filter(place => 
       place.category === 'stay' &&
       place.price >= appliedFilters.priceRange[0] &&
       place.price <= appliedFilters.priceRange[1] &&
       place.rating >= (appliedFilters.minRating || 0)
     );
-    const nameLower = locationName.toLowerCase();
-    const narrowed = base.filter(p => p.name.toLowerCase().includes(nameLower) || p.type.toLowerCase().includes(nameLower));
-    return narrowed.length > 0 ? narrowed : base;
-  }, [appliedFilters, locationName]);
+    return base;
+  }, [appliedFilters, places]);
 
   // AI Recommended stay: highest rating among filtered
   const aiRecommendedStay = useMemo(() => {
     if (filteredStays.length === 0) return null;
+    const explicit = filteredStays.find(p => (p as any).isRecommended);
+    if (explicit) return explicit as Place & { isRecommended?: boolean };
     return [...filteredStays].sort((a, b) => b.rating - a.rating)[0];
   }, [filteredStays]);
 
@@ -134,6 +184,9 @@ export const AccommodationSelectionPanel = ({ locationName }: AccommodationSelec
                             onApply={handleApplyFilters}
                             onClear={handleClearFilters}
                         />
+                        {fromCache && (
+                          <span className="text-xs text-slate-500">Using cached options</span>
+                        )}
                         <Popover open={sortOpen} onOpenChange={setSortOpen}>
                           <PopoverTrigger asChild>
                             <Button variant="outline" className="flex items-center gap-2 rounded-full font-semibold">
@@ -165,13 +218,24 @@ export const AccommodationSelectionPanel = ({ locationName }: AccommodationSelec
                 </div>
             </div>
             <div className="flex-grow min-h-0 overflow-y-auto p-3">
+        {loading && (
+          <div className="p-6 border rounded-lg bg-white text-center text-slate-600">Loading stays…</div>
+        )}
+        {error && !loading && (
+          <div className="p-6 border rounded-lg bg-white text-center text-red-600">{error}</div>
+        )}
         {aiRecommendedStay && (
           <div className="mb-4 border-2 border-slate-900 p-3 rounded-none">
                         <div className="flex items-center gap-2 mb-2">
                             <SparklesIcon className="h-5 w-5 text-blue-600"/>
                             <h3 className="font-bold text-lg">AI Top Pick for you</h3>
                         </div>
-                        <div onClick={() => router.push(`/plan/hotel/${aiRecommendedStay.id}`)} className="cursor-pointer">
+                        <div onClick={() => {
+                          try {
+                            const b64 = btoa(JSON.stringify(aiRecommendedStay));
+                            router.push(`/plan/hotel/detail?place=${b64}`);
+                          } catch {}
+                        }} className="cursor-pointer">
                              <ResultCard 
                                 place={aiRecommendedStay} 
                                 onHover={setHoveredPlaceId}
@@ -183,12 +247,17 @@ export const AccommodationSelectionPanel = ({ locationName }: AccommodationSelec
                 )}
 
                 {/* Single-column list */}
-                {otherStays.length === 0 && !aiRecommendedStay ? (
+                {otherStays.length === 0 && !aiRecommendedStay && !loading ? (
                   <div className="p-6 border rounded-lg bg-white text-center text-slate-600">No stays match your filters. Try adjusting the price, radius, or rating.</div>
                 ) : (
                   <div className="grid grid-cols-1 gap-3">
                       {otherStays.map(place => (
-                          <div key={place.id} onClick={() => router.push(`/plan/hotel/${place.id}`)} className="cursor-pointer">
+                          <div key={place.id} onClick={() => {
+                try {
+                  const b64 = btoa(JSON.stringify(place));
+                              router.push(`/plan/hotel/detail?place=${b64}`);
+                            } catch {}
+                          }} className="cursor-pointer">
                                <ResultCard 
                                   place={place} 
                                   onHover={setHoveredPlaceId}
