@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Trip } from '@/lib/trip-data';
 import { TravelLeg } from './TransportView'; // Import the type
 import { cn } from '@/lib/utils';
@@ -10,9 +10,11 @@ type TravelLegsSidebarProps = {
   trip: Trip;
   selectedLeg: TravelLeg | null;
   onSelectLeg: (leg: TravelLeg) => void;
+  onClearLeg?: (leg: TravelLeg) => void;
+  highlightDayNumber?: number | null;
 };
 
-export const TravelLegsSidebar = ({ trip, selectedLeg, onSelectLeg }: TravelLegsSidebarProps) => {
+export const TravelLegsSidebar = ({ trip, selectedLeg, onSelectLeg, onClearLeg, highlightDayNumber }: TravelLegsSidebarProps) => {
 
   // Intelligently generate the list of travel legs from the trip data
   const travelLegs: TravelLeg[] = [];
@@ -77,6 +79,17 @@ export const TravelLegsSidebar = ({ trip, selectedLeg, onSelectLeg }: TravelLegs
     return parts.join(' • ');
   };
 
+  // Refs for scrolling to an item when highlighted
+  const itemRefs = useRef<Record<number, HTMLDivElement | null>>({});
+
+  useEffect(() => {
+    if (!highlightDayNumber) return;
+    const el = itemRefs.current[highlightDayNumber];
+    if (el && typeof el.scrollIntoView === 'function') {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [highlightDayNumber]);
+
   return (
     <div className="p-6 h-full flex flex-col">
       <div className="pb-4 border-b">
@@ -90,8 +103,10 @@ export const TravelLegsSidebar = ({ trip, selectedLeg, onSelectLeg }: TravelLegs
             key={index}
             className={cn(
               "p-4 rounded-lg cursor-pointer border-2",
-              selectedLeg?.dayNumber === leg.dayNumber ? "border-slate-900 bg-slate-50" : "border-transparent hover:bg-slate-50"
+              selectedLeg?.dayNumber === leg.dayNumber ? "border-slate-900 bg-slate-50" : "border-transparent hover:bg-slate-50",
+              highlightDayNumber === leg.dayNumber ? "ring-2 ring-green-500" : ""
             )}
+            ref={(el) => { itemRefs.current[leg.dayNumber] = el; }}
             onClick={() => onSelectLeg(leg)}
           >
             <p className="text-sm text-slate-500 font-semibold">LEG {index + 1}</p>
@@ -99,6 +114,19 @@ export const TravelLegsSidebar = ({ trip, selectedLeg, onSelectLeg }: TravelLegs
               <p className="font-bold text-lg">{leg.from}</p>
               <ArrowLongRightIcon className="h-5 w-5 text-slate-400"/>
               <p className="font-bold text-lg">{leg.to}</p>
+              {isLegPlanned(leg) && (
+                <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border">Change selection</span>
+              )}
+              {isLegPlanned(leg) && onClearLeg && (
+                <button
+                  type="button"
+                  className="ml-2 text-xs text-red-600 hover:text-red-700 underline"
+                  onClick={(e) => { e.stopPropagation(); onClearLeg(leg); }}
+                  aria-label={`Clear transport selection for leg ${index + 1}`}
+                >
+                  Clear
+                </button>
+              )}
             </div>
             {isLegPlanned(leg) ? (
               <>

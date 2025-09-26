@@ -63,6 +63,7 @@ export const ItineraryView = ({ trip, setTrip }: ItineraryViewProps) => {
                 day={selectedDay}
                 onBack={handleGoBack}
                 onAddActivity={handleAddActivity}
+                interests={trip.interests}
             />
           ) : (
             <ItinerarySidebar 

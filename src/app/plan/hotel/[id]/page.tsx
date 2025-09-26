@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from 'react';
-import { notFound, useRouter } from 'next/navigation';
+import { notFound, useRouter, useParams } from 'next/navigation';
 import { mockPlaces } from '@/lib/mock-data';
 import Image from 'next/image';
+import { DEFAULT_HOTEL_IMAGE } from '@/config/images';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from "@/lib/utils";
@@ -67,9 +68,9 @@ const AddReviewForm = ({ onAddReview }: { onAddReview: (review: Review) => void 
     );
 };
 
-export default function HotelDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function HotelDetailPage() {
   const router = useRouter();
-  const { id } = React.use(params);
+  const { id } = useParams<{ id: string }>();
   const place = mockPlaces.find(p => p.id === id);
   const [reviews, setReviews] = useState<Review[]>([
         { name: "Alex", text: "An absolutely stunning hotel with incredible service. The views are breathtaking. Highly recommended!", rating: 5, date: "October 2025" },
@@ -105,10 +106,9 @@ export default function HotelDetailPage({ params }: { params: Promise<{ id: stri
 
         {/* Image Gallery (safe fallbacks, only render existing images) */}
         {(() => {
-          const fallback = "/hero/hero-1.jpg";
-          const gallery = (place!.images || []).filter(Boolean);
-          const primary = gallery[0] || fallback;
-          const others = gallery.slice(1, 5);
+          // ALWAYS use the default hotel image as primary; no others to ensure consistency
+          const primary = DEFAULT_HOTEL_IMAGE;
+          const others: string[] = [];
           return (
             <div className="grid grid-cols-4 grid-rows-2 gap-2 h-[500px] rounded-2xl overflow-hidden">
               <div className="col-span-2 row-span-2 relative">

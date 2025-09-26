@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Colombo", "type": "Major City", "description": "The bustling commercial capital of Sri Lanka.",
+    "latitude": 6.9271, "longitude": 79.8612, "tags": ["city", "culture", "food"]
+  },
+  {
+    "name": "Kandy", "type": "Cultural City", "description": "Home to the Temple of the Tooth Relic, a sacred Buddhist site.",
+    "latitude": 7.2906, "longitude": 80.6337, "tags": ["culture", "history", "nature"]
+  },
+  {
+    "name": "Ella", "type": "Mountain Town", "description": "Famous for its stunning views, tea plantations, and hiking trails like Little Adam's Peak.",
+    "latitude": 6.8667, "longitude": 81.0466, "tags": ["hiking", "nature", "views"]
+  },
+  {
+    "name": "Yala National Park", "type": "National Park", "description": "One of the world's best places to see leopards, elephants, and a huge variety of birds.",
+    "latitude": 6.3667, "longitude": 81.4667, "tags": ["wildlife", "safari", "nature"]
+  },
+  {
+    "name": "Mirissa", "type": "Beach Town", "description": "A popular spot for whale watching, surfing, and relaxing on sandy beaches.",
+    "latitude": 5.9482, "longitude": 80.4548, "tags": ["beaches", "wildlife", "leisure"]
+  },
+  {
+    "name": "Sigiriya", "type": "UNESCO World Heritage Site", "description": "An ancient rock fortress with dramatic views and historic frescoes.",
+    "latitude": 7.9575, "longitude": 80.76, "tags": ["culture", "history", "views"]
+  },
+  {
+    "name": "Galle Fort", "type": "Historic Fort", "description": "A beautiful Dutch colonial fort with cobblestone streets, boutiques, and cafes.",
+    "latitude": 6.027, "longitude": 80.217, "tags": ["history", "culture", "leisure"]
+  },
+  {
+    "name": "Nuwara Eliya", "type": "Hill Station", "description": "Known as 'Little England' for its cool climate and colonial-era architecture, surrounded by tea plantations.",
+    "latitude": 6.9497, "longitude": 80.7891, "tags": ["nature", "tea", "views"]
+  }
+]

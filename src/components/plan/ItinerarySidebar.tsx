@@ -7,6 +7,7 @@ import { Input } from '../ui/input';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
+import { format, parseISO } from 'date-fns';
 
 type ItinerarySidebarProps = {
   trip: Trip;
@@ -68,7 +69,18 @@ export const ItinerarySidebar = ({ trip, setTrip, activeDay, onDaySelect }: Itin
     >
       <div className="pb-4 border-b">
         <h1 className="text-2xl font-bold">{trip.name}</h1>
-        <p className="text-slate-500">Oct 5th - Oct 15th, 2025</p>
+        <p className="text-slate-500">
+          {(() => {
+            try {
+              if (trip.startDate && trip.endDate) {
+                const s = format(parseISO(trip.startDate), 'MMM do');
+                const e = format(parseISO(trip.endDate), 'MMM do, yyyy');
+                return `${s} - ${e}`;
+              }
+            } catch {}
+            return '';
+          })()}
+        </p>
       </div>
       
       <div className="mt-6 flex-1 overflow-y-auto pr-2">
@@ -93,6 +105,23 @@ export const ItinerarySidebar = ({ trip, setTrip, activeDay, onDaySelect }: Itin
                     <div className="flex-1">
                       <p className="font-bold">{day.location}</p>
                       <p className="text-sm text-slate-500">{day.title}</p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {day.activities.length > 0
+                          ? `${day.activities.length} activit${day.activities.length === 1 ? 'y' : 'ies'}`
+                          : 'No activities yet'}
+                      </p>
+                      {day.activities.length > 0 && (
+                        <ul className="mt-1 space-y-1">
+                          {day.activities.slice(0, 2).map((a) => (
+                            <li key={a.id} className="text-xs text-slate-600 truncate">
+                              • {a.name}
+                            </li>
+                          ))}
+                          {day.activities.length > 2 && (
+                            <li className="text-xs text-slate-400">+{day.activities.length - 2} more</li>
+                          )}
+                        </ul>
+                      )}
                     </div>
                     {hoveredDay === day.day && (
                       <motion.div initial={{opacity: 0, scale: 0.8}} animate={{opacity: 1, scale: 1}}>

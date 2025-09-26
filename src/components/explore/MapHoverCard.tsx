@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Button } from '../ui/button';
 import { StarIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/navigation';
+import { DEFAULT_HOTEL_IMAGE } from '@/config/images';
 
 type MapHoverCardProps = {
   place: Place;
@@ -27,7 +28,7 @@ export const MapHoverCard = ({ place, position }: MapHoverCardProps) => {
       }}
     >
       <div className="relative h-40 w-full">
-        <Image src={place.images[0]} alt={place.name} fill style={{ objectFit: 'cover' }} />
+        <Image src={place.category === 'stay' ? DEFAULT_HOTEL_IMAGE : (place.images?.[0] || DEFAULT_HOTEL_IMAGE)} alt={place.name} fill style={{ objectFit: 'cover' }} />
         {/* Overlay actions removed as requested */}
         {/* Rating badge on image */}
         {place.rating ? (

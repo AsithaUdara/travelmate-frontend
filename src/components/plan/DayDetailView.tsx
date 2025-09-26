@@ -1,15 +1,17 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ItineraryDay, Activity, mockSuggestions } from '@/lib/trip-data';
+import { ItineraryDay, Activity } from '@/lib/trip-data';
 import { Button } from '../ui/button';
 import { ChevronLeftIcon, PlusIcon } from '@heroicons/react/24/solid';
+import { getAISuggestions } from '@/services/ai';
 
 type DayDetailViewProps = {
   day: ItineraryDay;
   onBack: () => void;
   onAddActivity: (dayNumber: number, activity: Activity) => void;
+  interests?: string[];
 };
 
 // A reusable component for a single suggestion item
@@ -32,13 +34,38 @@ const SuggestionItem = ({ item, onAdd }: { item: Activity, onAdd: () => void }) 
   </motion.div>
 );
 
-export const DayDetailView = ({ day, onBack, onAddActivity }: DayDetailViewProps) => {
-  // We now only care about activity suggestions for this view
-  const suggestions = mockSuggestions[day.location]?.activities || [];
-  
-  const availableSuggestions = suggestions.filter(sug => 
-    !day.activities.some(act => act.id === sug.id)
-  );
+export const DayDetailView = ({ day, onBack, onAddActivity, interests }: DayDetailViewProps) => {
+  const [suggestions, setSuggestions] = useState<Activity[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await getAISuggestions(
+          day.location,
+          interests && interests.length > 0 ? interests : ['Cultural Sites', 'Wildlife', 'Hiking']
+        );
+        setSuggestions(data);
+      } catch (e: any) {
+        setError(e.message || 'Failed to fetch suggestions.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSuggestions();
+  }, [day.location, interests]);
+
+  // Filter out accommodation-like items if the AI returns hotels by mistake
+  const isAccommodationLike = (t?: string, n?: string) => {
+    const s = `${t || ''} ${n || ''}`.toLowerCase();
+    return /hotel|resort|villa|lodge|guest\s*house|hostel|inn|retreat/.test(s);
+  };
+  const availableSuggestions = suggestions
+    .filter(sug => !day.activities.some(act => act.id === sug.id))
+    .filter(sug => !isAccommodationLike(sug.type, sug.name));
 
   return (
     <motion.div
@@ -87,12 +114,16 @@ export const DayDetailView = ({ day, onBack, onAddActivity }: DayDetailViewProps
         <div className="mt-8">
             <h2 className="font-bold text-lg mb-2">AI Activity Suggestions for {day.location}</h2>
             <div className="space-y-3">
-                <AnimatePresence>
-                    {availableSuggestions.map(suggestion => (
-                       <SuggestionItem key={suggestion.id} item={suggestion} onAdd={() => onAddActivity(day.day, suggestion)} />
-                    ))}
-                </AnimatePresence>
-                {availableSuggestions.length === 0 && <p className="text-sm text-slate-500">You've added all available activity suggestions!</p>}
+              {isLoading && <p className="text-sm text-slate-500">Loading AI suggestions...</p>}
+              {error && <p className="text-sm text-red-500">{error}</p>}
+              <AnimatePresence>
+                {!isLoading && !error && availableSuggestions.map(suggestion => (
+                  <SuggestionItem key={suggestion.id} item={suggestion} onAdd={() => onAddActivity(day.day, suggestion)} />
+                ))}
+              </AnimatePresence>
+              {!isLoading && !error && availableSuggestions.length === 0 && (
+                <p className="text-sm text-slate-500">You've added all available activity suggestions!</p>
+              )}
             </div>
         </div>
       </div>

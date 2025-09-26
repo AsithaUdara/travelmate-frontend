@@ -34,6 +34,10 @@ export interface Trip {
   startDate: string;
   endDate: string;
   days: ItineraryDay[];
+  // Optional: user-selected interests to thread into AI suggestion calls
+  interests?: string[];
+  // Optional: cover image URL for the trip
+  coverImage?: string;
 }
 
 export const mockTrip: Trip = {

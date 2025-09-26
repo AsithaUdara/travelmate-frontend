@@ -1,10 +1,11 @@
 "use client";
-import React from 'react';
-import { ItineraryDay, Trip, Activity, mockSuggestions } from '@/lib/trip-data';
+import React, { useEffect, useState } from 'react';
+import { ItineraryDay, Trip, Activity } from '@/lib/trip-data';
 import { Button } from '../ui/button';
 import { PlusIcon, XMarkIcon, PhoneIcon } from '@heroicons/react/24/solid';
 import { AnimatePresence, motion } from 'framer-motion';
 import { format } from 'date-fns';
+import { getAISuggestions } from '@/services/ai';
 
 type DayDetailPanelProps = {
   day: ItineraryDay;
@@ -61,7 +62,31 @@ const ItemCard = ({ activity, onRemove, date, section }: { activity: Activity, o
 };
 
 export const DayDetailPanel = ({ day, trip, setTrip }: DayDetailPanelProps) => {
-  const suggestions = mockSuggestions[day.location]?.activities || [];
+  const [suggestions, setSuggestions] = useState<Activity[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await getAISuggestions(
+          day.location,
+          (trip as any).interests && (trip as any).interests.length > 0
+            ? (trip as any).interests
+            : ['Cultural Sites', 'Wildlife', 'Hiking']
+        );
+        setSuggestions(data);
+      } catch (e: any) {
+        setError(e.message || 'Failed to fetch suggestions.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSuggestions();
+  }, [day.location]);
+
   const availableSuggestions = suggestions.filter(sug => !day.activities.some(act => act.id === sug.id));
 
   const accommodation = day.activities.find(act => act.type === 'Accommodation');
@@ -125,19 +150,24 @@ export const DayDetailPanel = ({ day, trip, setTrip }: DayDetailPanelProps) => {
     <div className="mt-8">
     <p className="font-bold mb-2">AI Suggestions for {day.location}</p>
     <div className="space-y-2">
+      {isLoading && <p className="text-sm text-slate-500">Loading AI suggestions...</p>}
+      {error && <p className="text-sm text-red-500">{error}</p>}
       <AnimatePresence>
-      {availableSuggestions.map(sug => (
-         <motion.div key={sug.id} layout initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}} className="flex items-center justify-between p-3 border rounded-lg">
-          <div>
-            <p className="font-semibold">{sug.name}</p>
-            <p className="text-sm text-slate-500">{sug.type}</p>
-          </div>
-          <Button size="icon" variant="outline" className="h-8 w-8 rounded-full" onClick={() => handleAddActivity(sug)}>
-            <PlusIcon className="h-4 w-4" />
-          </Button>
-         </motion.div>
-      ))}
+        {!isLoading && !error && availableSuggestions.map(sug => (
+          <motion.div key={sug.id} layout initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}} className="flex items-center justify-between p-3 border rounded-lg">
+            <div>
+              <p className="font-semibold">{sug.name}</p>
+              <p className="text-sm text-slate-500">{sug.type}</p>
+            </div>
+            <Button size="icon" variant="outline" className="h-8 w-8 rounded-full" onClick={() => handleAddActivity(sug)}>
+              <PlusIcon className="h-4 w-4" />
+            </Button>
+          </motion.div>
+        ))}
       </AnimatePresence>
+      {!isLoading && !error && availableSuggestions.length === 0 && (
+        <p className="text-sm text-slate-500">You've added all available suggestions!</p>
+      )}
     </div>
     </div>
   </div>
